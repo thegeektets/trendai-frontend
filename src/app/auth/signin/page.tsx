@@ -6,7 +6,7 @@ import { clearAuthError } from "@/store/slices/authSlice";
 import { Box, Typography, Link as MuiLink } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import Signin from "@/components/Auth/Signin";
+import Signin from "@/components/Auth/SignIn";
 import logo from "@/assets/logo.png";
 import gridImage from "@/assets/grids/grid-02.svg";
 import { AppDispatch } from "@/store";

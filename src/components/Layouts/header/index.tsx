@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { AppBar, Toolbar, Box } from "@mui/material";
 import Image from "next/image";
@@ -10,23 +11,37 @@ export function Header() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    console.log("storedUser", storedUser);
-    
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       const userData = {
         email: parsedUser.email,
         role: parsedUser.role,
         name: parsedUser.profile?.name || parsedUser.profile?.name,
-        platform: parsedUser.role === "influencer" ? parsedUser.profile?.platform : undefined,
-        followersCount: parsedUser.role === "influencer" ? parsedUser.profile?.followersCount : undefined,
-        socialMediaHandle: parsedUser.role === "influencer" ? parsedUser.profile?.socialMediaHandle : undefined,
-        createdAt:  parsedUser.profile?.createdAt,
-        companyName: parsedUser.role === "brand" ? parsedUser.profile?.name : undefined,
-        companyIndustry: parsedUser.role === "brand" ? parsedUser.profile?.industry : undefined,
-        companyWebsite: parsedUser.role === "brand" ? parsedUser.profile?.website : undefined,
-        companyDescription: parsedUser.role === "brand" ? parsedUser.profile?.description : undefined,
-
+        platform:
+          parsedUser.role === "influencer"
+            ? parsedUser.profile?.platform
+            : undefined,
+        followersCount:
+          parsedUser.role === "influencer"
+            ? parsedUser.profile?.followersCount
+            : undefined,
+        socialMediaHandle:
+          parsedUser.role === "influencer"
+            ? parsedUser.profile?.socialMediaHandle
+            : undefined,
+        createdAt: parsedUser.profile?.createdAt,
+        companyName:
+          parsedUser.role === "brand" ? parsedUser.profile?.name : undefined,
+        companyIndustry:
+          parsedUser.role === "brand"
+            ? parsedUser.profile?.industry
+            : undefined,
+        companyWebsite:
+          parsedUser.role === "brand" ? parsedUser.profile?.website : undefined,
+        companyDescription:
+          parsedUser.role === "brand"
+            ? parsedUser.profile?.description
+            : undefined,
       };
       setUserDetails(userData);
     }

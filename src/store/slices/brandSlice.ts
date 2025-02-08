@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";

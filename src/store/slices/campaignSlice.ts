@@ -1,21 +1,10 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiRequest } from "../../utils/api";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-// Define the shape of the campaign data
-interface Campaign {
-  _id: string;
-  name: string;
-  description: string;
-  budget: number;
-  startDate: string;
-  endDate: string;
-  status: "active" | "paused" | "completed";
-  brand: string;
-}
 
 // Define the state shape
 interface CampaignState {
-  campaigns: Campaign[];
+  campaigns: any[];
   loading: boolean;
   error: string | null;
 }
@@ -26,40 +15,105 @@ const initialState: CampaignState = {
   error: null,
 };
 
+// Thunk to create a campaign
 export const createCampaign = createAsyncThunk(
-  "campaigns/createCampaign",
-  async (campaignData: Campaign, { rejectWithValue }) => {
+  "campaign/createCampaign",
+  async (campaignData: any, { rejectWithValue }) => {
     try {
       const response = await apiRequest("campaigns", "POST", campaignData);
+      return response.data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to create submission";
+      console.log("errorMessage", errorMessage);
+      throw rejectWithValue(errorMessage);
+    }
+  },
+);
+
+// Thunk to fetch campaigns by brand ID
+export const getCampaignsByBrand = createAsyncThunk(
+  "campaign/getCampaignsByBrand",
+  async (brandId: string, { rejectWithValue }) => {
+    try {
+      const response = await apiRequest(`campaigns/brand/${brandId}`, "GET");
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.response.data || error.message);
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch campaigns";
+      console.log("errorMessage", errorMessage);
+      throw rejectWithValue(errorMessage);
+    }
+  },
+);
+
+// Thunk to fetch all campaigns
+export const getAllCampaigns = createAsyncThunk(
+  "campaign/getAllCampaigns",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await apiRequest("campaigns", "GET");
+      return response; // Assuming response contains the campaigns
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch all campaigns";
+      console.log("errorMessage", errorMessage);
+      throw rejectWithValue(errorMessage);
     }
   },
 );
 
 const campaignSlice = createSlice({
-  name: "campaigns",
+  name: "campaign",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(addCampaign.pending, (state) => {
+      // Handle createCampaign lifecycle
+      .addCase(createCampaign.pending, (state) => {
         state.loading = true;
       })
       .addCase(createCampaign.fulfilled, (state, action) => {
+        console.log("action.payload", action.payload);
         state.loading = false;
         state.campaigns.push(action.payload);
       })
       .addCase(createCampaign.rejected, (state, action) => {
+        console.log("action.payload", action.payload);
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Handle getAllCampaigns lifecycle
+      .addCase(getAllCampaigns.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAllCampaigns.fulfilled, (state, action) => {
+        console.log("action.payload", action.payload);
+        state.loading = false;
+        state.campaigns = action.payload; // Replace campaigns with fetched data
+      })
+      .addCase(getAllCampaigns.rejected, (state, action) => {
+        console.log("action.payload", action.payload);
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Handle getCampaignsByBrand lifecycle
+      .addCase(getCampaignsByBrand.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getCampaignsByBrand.fulfilled, (state, action) => {
+        console.log("action.payload", action.payload);
+        state.loading = false;
+        state.campaigns = action.payload; // Replace campaigns with fetched data
+      })
+      .addCase(getCampaignsByBrand.rejected, (state, action) => {
+        console.log("action.payload", action.payload);
         state.loading = false;
         state.error = action.payload as string;
       });
   },
 });
-
-// Export actions for dispatching
-export const {} = campaignSlice.actions;
 
 // Export the reducer to be used in the store
 export default campaignSlice.reducer;

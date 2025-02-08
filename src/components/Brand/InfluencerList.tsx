@@ -9,6 +9,10 @@ import {
   Avatar,
   Grid,
   Divider,
+  CardHeader,
+  Chip,
+  Stack,
+  Tooltip,
 } from "@mui/material";
 import { getCampaignsByBrand } from "@/store/slices/campaignSlice";
 import { AppDispatch } from "@/store";
@@ -65,7 +69,7 @@ export default function InfluencerList({ brand }: { brand: string }) {
   return (
     <Box p={3}>
       <Typography variant="h4" fontWeight="bold" gutterBottom>
-        Active Campaigns
+        Campaigns
       </Typography>
 
       {localLoading ? (
@@ -94,29 +98,36 @@ export default function InfluencerList({ brand }: { brand: string }) {
             <Grid item xs={12} key={campaign.id}>
               <Card sx={{ p: 2, boxShadow: 3 }}>
                 <CardContent>
-                  <Typography variant="h6" fontWeight="bold">
-                    {campaign.name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    {campaign.description}
-                  </Typography>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Box>
+                      <Typography variant="h6" fontWeight="bold">
+                        {campaign.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {campaign.description}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={`Budget : KES ${campaign.budget.toLocaleString()}`}
+                      color="primary"
+                      sx={{ fontWeight: "bold" }}
+                    />
+                  </Stack>
+
                   <Typography
                     variant="caption"
                     color="text.secondary"
                     gutterBottom
                   >
-                    Budget: KES {campaign.budget.toLocaleString()} |{" "}
                     {campaign.startDate} - {campaign.endDate}
                   </Typography>
+
                   <Divider sx={{ my: 2 }} />
+
                   <Typography
                     variant="subtitle1"
                     fontWeight="bold"
-                    gutterBottom
+                    marginBottom={"15px"}
                   >
                     Influencers
                   </Typography>
@@ -128,9 +139,8 @@ export default function InfluencerList({ brand }: { brand: string }) {
                   ) : (
                     <Grid container spacing={2}>
                       {campaign.influencers.map((influencer) => {
-                        const submissionCount = influencer.submissions.length;
-                        // Count submissions by status
-                        const statusCounts = influencer.submissions.reduce(
+                        const { submissions } = influencer;
+                        const statusCounts = submissions.reduce(
                           (acc, submission) => {
                             acc[submission.status] =
                               (acc[submission.status] || 0) + 1;
@@ -139,69 +149,85 @@ export default function InfluencerList({ brand }: { brand: string }) {
                           { pending: 0, approved: 0, rejected: 0 },
                         );
 
-                        const latestSubmission = influencer.submissions.reduce(
+                        const latestSubmission = submissions.reduce(
                           (latest, current) =>
                             new Date(current.date) > new Date(latest.date)
                               ? current
                               : latest,
-                          influencer.submissions[0],
+                          submissions[0],
                         );
-
-                        const statusColors: Record<string, string> = {
-                          pending: "warning.main",
-                          approved: "success.main",
-                          rejected: "error.main",
-                        };
 
                         return (
                           <Grid item xs={12} md={4} key={influencer.id}>
                             <Card sx={{ boxShadow: 2 }}>
-                              <CardContent
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 2,
-                                }}
-                              >
-                                <Avatar
-                                  src={influencer.avatar}
-                                  alt={influencer.name}
-                                />
-                                <Box>
-                                  <Typography fontWeight="bold">
-                                    {influencer.name}
+                              <CardHeader
+                                avatar={
+                                  <Avatar
+                                    src={influencer.avatar}
+                                    alt={influencer.name}
+                                  />
+                                }
+                                title={influencer.name}
+                                subheader={
+                                  <>
+                                    <Typography variant="caption">
+                                      {influencer.platform} | @
+                                      {influencer.socialMediaHandle}
+                                    </Typography>
+                                  </>
+                                }
+                              />
+                              <CardContent>
+                                <Stack
+                                  direction="row"
+                                  spacing={1}
+                                  alignItems="center"
+                                >
+                                  <Typography variant="body2" fontWeight="bold">
+                                    Followers:
                                   </Typography>
-                                  <Typography fontWeight="bold">
-                                    Platform: {influencer.platform}
-                                  </Typography>
-                                  <Typography fontWeight="bold">
-                                    Handle: {influencer.socialMediaHandle}
-                                  </Typography>
-                                  <Typography fontWeight="bold">
-                                    Followers: {influencer.followersCount}
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                  >
-                                    Latest Submission:{" "}
-                                    {latestSubmission.date.split("T")[0]}
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    color={
-                                      statusColors[latestSubmission.status]
-                                    }
-                                  >
-                                    Status: {latestSubmission.status}
-                                  </Typography>
-                                  <Typography variant="body2">
-                                    Submissions: {submissionCount} (
-                                    {statusCounts.pending} pending,{" "}
-                                    {statusCounts.approved} approved,{" "}
-                                    {statusCounts.rejected} rejected)
-                                  </Typography>
-                                </Box>
+                                  <Chip
+                                    label={influencer.followersCount.toLocaleString()}
+                                    size="small"
+                                  />
+                                </Stack>
+
+                                <Stack direction="row" spacing={1} mt={1}>
+                                  <Tooltip title="Pending">
+                                    <Chip
+                                      label={"pending :" + statusCounts.pending}
+                                      color="warning"
+                                      size="small"
+                                    />
+                                  </Tooltip>
+                                  <Tooltip title="Approved">
+                                    <Chip
+                                      label={
+                                        "approved :" + statusCounts.approved
+                                      }
+                                      color="success"
+                                      size="small"
+                                    />
+                                  </Tooltip>
+                                  <Tooltip title="Rejected">
+                                    <Chip
+                                      label={
+                                        "rejected :" + statusCounts.approved
+                                      }
+                                      color="error"
+                                      size="small"
+                                    />
+                                  </Tooltip>
+                                </Stack>
+
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  mt={1}
+                                >
+                                  Latest Submission:{" "}
+                                  {latestSubmission.date.split("T")[0]}
+                                </Typography>
                               </CardContent>
                             </Card>
                           </Grid>

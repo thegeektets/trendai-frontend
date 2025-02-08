@@ -17,11 +17,9 @@ import {
   Paper,
 } from "@mui/material";
 import CampaignList from "@/components/Influencer/CampaignList";
-import CampaignDetails from "@/components/Influencer/CampaignDetails";
 import PerformanceSnapshot from "@/components/Influencer/PerformanceSnapshot";
 import InfluencerList from "@/components/Brand/InfluencerList";
 import SubmissionApproval from "@/components/Brand/SubmissionApproval";
-import SnapshotPage from "@/components/Brand/SnapshotPage";
 import AddCampaign from "@/components/Brand/AddCampaign";
 import {
   Campaign,
@@ -37,7 +35,7 @@ const drawerWidth = 240;
 
 export default function Dashboard() {
   const [role, setRole] = useState<string | null>(null);
-  const [selectedPage, setSelectedPage] = useState<string>("Campaign List");
+  const [selectedPage, setSelectedPage] = useState<string>("Campaigns");
 
   const [userDetails, setUserDetails] = useState<any>(null); // Add state for user profile
   const router = useRouter();
@@ -74,16 +72,14 @@ export default function Dashboard() {
   }, [router.query]);
 
   const influencerMenu = [
-    { text: "Campaign List", icon: <Campaign /> },
-    { text: "Campaign Details", icon: <Info /> },
-    { text: "Performance Snapshot", icon: <Assessment /> },
+    { text: "Campaigns", icon: <Campaign /> },
+    { text: "Performance", icon: <Assessment /> },
   ];
 
   const brandMenu = [
-    { text: "Influencer List", icon: <People /> },
-    { text: "Submission Approval", icon: <CheckCircle /> },
-    { text: "Campaign Snapshot", icon: <BarChart /> },
-    { text: "Add Campaign", icon: <AddCircle /> },
+    { text: "Influencers", icon: <People /> },
+    { text: "Submissions", icon: <CheckCircle /> },
+    { text: "New Campaign", icon: <AddCircle /> },
   ];
 
   const menuItems = role === "influencer" ? influencerMenu : brandMenu;
@@ -99,25 +95,22 @@ export default function Dashboard() {
   const renderPage = () => {
     const formattedPage = selectedPage.replace(/\s+/g, "-").toLowerCase(); // Convert to hyphenated URL format
     switch (formattedPage) {
-      case "campaign-list":
+      case "campaigns":
         return <CampaignList />;
-      case "campaign-details":
-        return <CampaignDetails />;
-      case "performance-snapshot":
+      case "performance":
         return <PerformanceSnapshot />;
-      case "influencer-list":
-        return <InfluencerList />;
-      case "submission-approval":
+
+      case "influencers":
+        return <InfluencerList brand={userDetails._id} />;
+      case "submissions":
         return <SubmissionApproval />;
-      case "campaign-snapshot":
-        return <SnapshotPage />;
-      case "add-campaign":
+      case "new-campaign":
         return <AddCampaign brand={userDetails._id} />;
       default:
         return <Typography variant="h6">Select a page</Typography>;
     }
   };
-  
+
   const renderUserProfile = () => {
     if (role === "influencer" && userDetails) {
       return (

@@ -36,10 +36,10 @@ export function UserInfo({ userDetails }: UserInfoProps) {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    router.push("/auth/signin");
-
-    handleMenuClose();
-    // Redirect or update auth state if needed
+    router.push("/auth/signin").then(() => {
+      // Ensure the menu is closed after the redirect
+      handleMenuClose();
+    });
   };
 
   return (

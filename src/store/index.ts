@@ -3,7 +3,7 @@ import authReducer from "./slices/authSlice";
 import influencerReducer from "./slices/influencerSlice";
 import brandReducer from "./slices/brandSlice";
 import campaignReducer from "./slices/brandSlice";
-
+import submissionReducer from "./slices/submissionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +11,7 @@ export const store = configureStore({
     influencer: influencerReducer,
     brand: brandReducer,
     campaign: campaignReducer,
+    submission: submissionReducer,
   },
 });
 

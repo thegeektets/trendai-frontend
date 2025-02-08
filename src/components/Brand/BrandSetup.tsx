@@ -72,7 +72,7 @@ export default function BrandSetup({ user_id }: BrandSetupProps) {
       setSuccessMessage("Brand profile setup successful! Redirecting...");
       setTimeout(() => {
         router.push("/dashboard");
-      }, 2000);
+      }, 1000);
     }
   };
 
