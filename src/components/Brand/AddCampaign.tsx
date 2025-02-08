@@ -87,7 +87,7 @@ export default function AddCampaign({ brand }: AddCampaignProps) {
     } else {
       setSuccessMessage("Campaign added successfully! Redirecting...");
       setTimeout(() => {
-        window.location.href = "/dashboard?page=influencer-list";
+        window.location.href = "/dashboard?page=influencers";
       }, 1000);
     }
   };

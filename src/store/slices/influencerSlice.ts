@@ -20,10 +20,10 @@ export const setupInfluencerProfile = createAsyncThunk(
   async (data: any, { rejectWithValue }) => {
     try {
       const response = await apiRequest("influencers", "POST", data);
-      return response.data;
+      return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to submit influencer profile",
+        error.response?.message || "Failed to submit influencer profile",
       );
     }
   },

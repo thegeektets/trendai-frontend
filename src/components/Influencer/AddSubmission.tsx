@@ -19,6 +19,7 @@ interface AddSubmissionProps {
   campaign: {
     _id: string;
     name: string;
+    brand: string;
   };
   influencerId: string;
   onClose: () => void;
@@ -41,7 +42,8 @@ export default function AddSubmission({
     contentLink: "",
     likes: 0,
     comments: 0,
-    campaignId: campaign._id.toString(),
+    campaign: campaign._id.toString(),
+    brand: campaign.brand,
     influencer: influencerId,
   });
 

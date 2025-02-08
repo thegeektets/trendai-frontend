@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import {
   Box,
   Drawer,
@@ -15,32 +16,39 @@ import {
   CssBaseline,
   Divider,
   Paper,
-  CircularProgress,
 } from "@mui/material";
-import CampaignList from "@/components/Influencer/CampaignList";
-import PerformanceSnapshot from "@/components/Influencer/PerformanceSnapshot";
-import InfluencerList from "@/components/Brand/InfluencerList";
-import SubmissionApproval from "@/components/Brand/SubmissionApproval";
-import AddCampaign from "@/components/Brand/AddCampaign";
 import {
   Campaign,
-  Info,
   Assessment,
   People,
   CheckCircle,
-  BarChart,
   AddCircle,
 } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
+// Lazy load components
+const CampaignList = dynamic(
+  () => import("@/components/Influencer/CampaignList"),
+);
+const PerformanceSnapshot = dynamic(
+  () => import("@/components/Influencer/PerformanceSnapshot"),
+);
+const InfluencerList = dynamic(
+  () => import("@/components/Brand/InfluencerList"),
+);
+const SubmissionApproval = dynamic(
+  () => import("@/components/Brand/SubmissionApproval"),
+);
+const AddCampaign = dynamic(() => import("@/components/Brand/AddCampaign"));
+
 export default function Dashboard() {
   const [role, setRole] = useState<string | null>(null);
   const [selectedPage, setSelectedPage] = useState<string>("Campaign");
-
-  const [userDetails, setUserDetails] = useState<any>(null); // Add state for user profile
+  const [userDetails, setUserDetails] = useState<any>(null);
   const router = useRouter();
 
+  // Fetch user details and set role
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) {
@@ -57,43 +65,50 @@ export default function Dashboard() {
     setRole(parsedUser.role);
     setUserDetails(parsedUser.profile);
 
-    // Check if query is available and contains 'page' before using it
-    if (router.query && router.query.page) {
-      const { page } = router.query;
-      const formattedPage = page.replace(/-/g, " "); // Convert hyphenated URL to space
+    // Set the selected page based on the query or default
+    const queryPage = router.query?.page;
+    if (queryPage) {
+      const formattedPage = queryPage.replace(/-/g, " ");
       setSelectedPage(formattedPage);
     } else {
       const defaultPage =
-        parsedUser.role === "influencer" ? "Campaign List" : "Influencer List";
+        parsedUser.role === "influencer" ? "Campaigns" : "Influencers";
       const formattedDefaultPage = defaultPage
         .replace(/\s+/g, "-")
-        .toLowerCase(); // Convert to hyphenated URL
+        .toLowerCase();
       router.push(`/dashboard?page=${formattedDefaultPage}`);
     }
   }, [router.query]);
 
-  const influencerMenu = [
-    { text: "Campaigns", icon: <Campaign /> },
-    { text: "Performance", icon: <Assessment /> },
-  ];
+  // Memoize menu items based on role
+  const menuItems = useMemo(() => {
+    if (role === "influencer") {
+      return [
+        { text: "Campaigns", icon: <Campaign /> },
+        { text: "Performance", icon: <Assessment /> },
+      ];
+    } else if (role === "brand") {
+      return [
+        { text: "Influencers", icon: <People /> },
+        { text: "Submissions", icon: <CheckCircle /> },
+        { text: "New Campaign", icon: <AddCircle /> },
+      ];
+    }
+    return [];
+  }, [role]);
 
-  const brandMenu = [
-    { text: "Influencers", icon: <People /> },
-    { text: "Submissions", icon: <CheckCircle /> },
-    { text: "New Campaign", icon: <AddCircle /> },
-  ];
+  // Handle menu item clicks
+  const handleMenuClick = useCallback(
+    (text: string) => {
+      setSelectedPage(text);
+      const hyphenatedText = text.replace(/\s+/g, "-").toLowerCase();
+      router.push(`/dashboard?page=${hyphenatedText}`);
+    },
+    [router],
+  );
 
-  const menuItems = role === "influencer" ? influencerMenu : brandMenu;
-
-  const handleMenuClick = (text: string) => {
-    setSelectedPage(text);
-
-    // Convert the page text to hyphenated URL
-    const hyphenatedText = text.replace(/\s+/g, "-").toLowerCase();
-    router.push(`/dashboard?page=${hyphenatedText}`);
-  };
-
-  const renderPage = () => {
+  // Render the selected page
+  const renderPage = useMemo(() => {
     const formattedPage = selectedPage.replace(/\s+/g, "-").toLowerCase();
     switch (formattedPage) {
       case "campaigns":
@@ -101,11 +116,11 @@ export default function Dashboard() {
       case "performance":
         return <PerformanceSnapshot />;
       case "influencers":
-        return <InfluencerList brand={userDetails._id} />;
+        return <InfluencerList brand={userDetails?._id} />;
       case "submissions":
-        return <SubmissionApproval />;
+        return <SubmissionApproval brand={userDetails?._id} />;
       case "new-campaign":
-        return <AddCampaign brand={userDetails._id} />;
+        return <AddCampaign brand={userDetails?._id} />;
       default:
         return (
           <Box
@@ -120,9 +135,13 @@ export default function Dashboard() {
           </Box>
         );
     }
-  };
-  const renderUserProfile = () => {
-    if (role === "influencer" && userDetails) {
+  }, [selectedPage, userDetails]);
+
+  // Render user profile
+  const renderUserProfile = useMemo(() => {
+    if (!userDetails) return null;
+
+    if (role === "influencer") {
       return (
         <Box
           sx={{
@@ -146,8 +165,7 @@ export default function Dashboard() {
           </Typography>
         </Box>
       );
-    }
-    if (role === "brand" && userDetails) {
+    } else if (role === "brand") {
       return (
         <Box
           sx={{
@@ -167,7 +185,7 @@ export default function Dashboard() {
       );
     }
     return null;
-  };
+  }, [userDetails, role]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -203,31 +221,32 @@ export default function Dashboard() {
       >
         <Toolbar />
         <Paper elevation={4} sx={{ margin: 2, padding: 2 }}>
-          {renderUserProfile()}
+          {renderUserProfile}
         </Paper>
         <List>
-          {menuItems.map(({ text, icon }) => (
-            <>
-              <ListItem
-                button
-                key={text}
-                onClick={() => handleMenuClick(text)}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "rgba(255, 255, 255, 0.2)",
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ color: "white" }}>{icon}</ListItemIcon>
-                <ListItemText primary={text} sx={{ color: "white" }} />
-              </ListItem>
-              <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }} />
-            </>
-          ))}
+          {menuItems.flatMap(({ text, icon }) => [
+            <ListItem
+              key={text}
+              button
+              onClick={() => handleMenuClick(text)}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: "white" }}>{icon}</ListItemIcon>
+              <ListItemText primary={text} sx={{ color: "white" }} />
+            </ListItem>,
+            <Divider
+              key={`${text}-divider`}
+              sx={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+            />,
+          ])}
         </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-        {renderPage()}
+        {renderPage}
       </Box>
     </Box>
   );

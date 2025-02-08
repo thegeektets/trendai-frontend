@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -13,7 +14,6 @@ export async function apiRequest(
   };
 
   console.log("token", token);
-
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -38,6 +38,6 @@ export async function apiRequest(
     return responseData;
   } catch (error: any) {
     // Ensure we always return a meaningful error
-    throw new Error(error.message || "Network error, please try again.");
+    throw new Error(error?.message || "Network error, please try again.");
   }
 }

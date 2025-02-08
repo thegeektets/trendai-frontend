@@ -21,10 +21,10 @@ export const createCampaign = createAsyncThunk(
   async (campaignData: any, { rejectWithValue }) => {
     try {
       const response = await apiRequest("campaigns", "POST", campaignData);
-      return response.data;
+      return response;
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || "Failed to create submission";
+        error?.message || "Failed to create submission";
       console.log("errorMessage", errorMessage);
       throw rejectWithValue(errorMessage);
     }
@@ -40,7 +40,7 @@ export const getCampaignsByBrand = createAsyncThunk(
       return response;
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || "Failed to fetch campaigns";
+        error?.message || "Failed to fetch campaigns";
       console.log("errorMessage", errorMessage);
       throw rejectWithValue(errorMessage);
     }
@@ -56,7 +56,7 @@ export const getAllCampaigns = createAsyncThunk(
       return response; // Assuming response contains the campaigns
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || "Failed to fetch all campaigns";
+        error?.message || "Failed to fetch all campaigns";
       console.log("errorMessage", errorMessage);
       throw rejectWithValue(errorMessage);
     }

@@ -21,9 +21,9 @@ export const setupBrandProfile = createAsyncThunk(
   async (brandData: any, { rejectWithValue }) => {
     try {
       const response = await apiRequest("brands", "POST", brandData);
-      return response.data;
+      return response;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.message || "Something went wrong");
     }
   }
 );

@@ -96,7 +96,7 @@ export default function InfluencerList({ brand }: { brand: string }) {
         </Box>
       ) : (
         <Grid container spacing={3}>
-          {localCampaigns.map((campaign: Campaign) => (
+          {localCampaigns &&localCampaigns.map((campaign: Campaign) => (
             <Grid item xs={12} key={campaign.id}>
               <Card sx={{ p: 2, boxShadow: 3 }}>
                 <CardContent>

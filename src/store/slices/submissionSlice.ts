@@ -4,12 +4,14 @@ import { apiRequest } from "../../utils/api";
 
 interface SubmissionState {
   loading: boolean;
-  submission: any;
+  submissions: any[]; // Array to store fetched submissions
+  submission: any; // Single submission (for submission actions)
   error: string | null;
 }
 
 const initialState: SubmissionState = {
   loading: false,
+  submissions: [], // Initialize as an empty array
   submission: null,
   error: null,
 };
@@ -23,7 +25,36 @@ export const submitSubmission = createAsyncThunk(
   ) => {
     try {
       const response = await apiRequest("submissions", "POST", submissionData);
-      return response.data;
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  },
+);
+
+// Async thunk to fetch submissions by brand ID
+export const fetchSubmissionsByBrand = createAsyncThunk(
+  "submission/fetchSubmissionsByBrand",
+  async (brandId: string, thunkAPI) => {
+    try {
+      const response = await apiRequest(`submissions/brand/${brandId}`, "GET");
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  },
+);
+
+// Async thunk to fetch submissions by influencer ID
+export const fetchSubmissionsByInfluencer = createAsyncThunk(
+  "submission/fetchSubmissionsByInfluencer",
+  async (influencerId: string, thunkAPI) => {
+    try {
+      const response = await apiRequest(
+        `submissions/influencer/${influencerId}`,
+        "GET",
+      );
+      return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -36,6 +67,7 @@ const submissionSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Handle submitSubmission
       .addCase(submitSubmission.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -48,6 +80,38 @@ const submissionSlice = createSlice({
       .addCase(submitSubmission.rejected, (state, action: any) => {
         state.loading = false;
         state.error = action.payload || "Submission failed. Please try again.";
+      })
+
+      // Handle fetchSubmissionsByBrand
+      .addCase(fetchSubmissionsByBrand.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubmissionsByBrand.fulfilled, (state, action: any) => {
+        state.loading = false;
+        state.submissions = action.payload; // Store fetched submissions
+        state.error = null;
+      })
+      .addCase(fetchSubmissionsByBrand.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error =
+          action.payload || "Failed to fetch submissions by brand. Please try again.";
+      })
+
+      // Handle fetchSubmissionsByInfluencer
+      .addCase(fetchSubmissionsByInfluencer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubmissionsByInfluencer.fulfilled, (state, action: any) => {
+        state.loading = false;
+        state.submissions = action.payload; // Store fetched submissions
+        state.error = null;
+      })
+      .addCase(fetchSubmissionsByInfluencer.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error =
+          action.payload || "Failed to fetch submissions by influencer. Please try again.";
       });
   },
 });

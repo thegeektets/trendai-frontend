@@ -1,45 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Tab, Tabs, Card, CardContent, Divider, Avatar, Tooltip, Grid, IconButton } from '@mui/material';
-import { ThumbUp, Comment } from '@mui/icons-material';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Tab,
+  Tabs,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
+import ApprovalCard from "./ApprovalCard"; // Import the ApprovalCard component
+import { fetchSocialMediaPreview } from "@/utils/preview";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/store";
+import { fetchSubmissionsByBrand } from "@/store/slices/submissionSlice";
 
-// Sample Data
-const sampleSubmissions = [
-  {
-    id: '1',
-    contentLink: 'https://example.com/content1',
-    influencer: 'John Doe',
-    status: 'pending',
-    date: '2025-02-08',
-    campaignName: 'Campaign A',
-    likes: 120,
-    comments: 30,
-  },
-  {
-    id: '2',
-    contentLink: 'https://example.com/content2',
-    influencer: 'Jane Smith',
-    status: 'approved',
-    date: '2025-02-07',
-    campaignName: 'Campaign A',
-    likes: 250,
-    comments: 50,
-  },
-  {
-    id: '3',
-    contentLink: 'https://example.com/content3',
-    influencer: 'Emily Clark',
-    status: 'rejected',
-    date: '2025-02-06',
-    campaignName: 'Campaign B',
-    likes: 90,
-    comments: 10,
-  },
-];
-
-const SubmissionApproval = () => {
+export default function SubmissionApproval({ brand }: { brand: string }) {
+  const dispatch = useDispatch<AppDispatch>();
   const [tabValue, setTabValue] = useState(0);
-  const [submissions, setSubmissions] = useState(sampleSubmissions);
-  const [contentPreviews, setContentPreviews] = useState<{ [key: string]: { title: string, imageUrl: string } }>({});
+  const [localSubmissions, setLocalSubmissions] = useState<any[]>([]);
+  const [contentPreviews, setContentPreviews] = useState<{
+    [key: string]: { title: string; imageUrl: string; description: string };
+  }>({});
+  const { loading, submissions } = useSelector(
+    (state: any) => state.submission,
+  );
+  const [localLoading, setLocalLoading] = useState<boolean>(false);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -48,34 +34,42 @@ const SubmissionApproval = () => {
   const handleStatusChange = (submissionId: string, status: string) => {
     setSubmissions((prevSubmissions) =>
       prevSubmissions.map((submission) =>
-        submission.id === submissionId ? { ...submission, status } : submission
-      )
+        submission.id === submissionId ? { ...submission, status } : submission,
+      ),
     );
   };
 
   const filterSubmissions = (status: string) => {
-    if (status === 'all') return submissions;
-    return submissions.filter((submission) => submission.status === status);
+    if (status === "all") return localSubmissions;
+    return localSubmissions.filter(
+      (submission) => submission.status === status,
+    );
   };
 
-  // Fetch content preview (title and image) from contentLink
-  const fetchContentPreview = async (contentLink: string) => {
-    try {
-      const response = await fetch(`https://api.linkpreview.net?key=YOUR_API_KEY&q=${contentLink}`);
-      const data = await response.json();
-      return { title: data.title, imageUrl: data.image || 'https://via.placeholder.com/100' };
-    } catch (error) {
-      console.error('Error fetching content preview:', error);
-      return { title: 'No title available', imageUrl: 'https://via.placeholder.com/100' };
+  // Corrected async function
+  const getBrandSubmissions = async (brand: string) => {
+    setLocalLoading(true);
+    const result = await dispatch(fetchSubmissionsByBrand(brand));
+    console.log("result", result);
+    if (result.payload) {
+      setLocalSubmissions(result.payload);
     }
+    setLocalLoading(false);
   };
 
   useEffect(() => {
+    console.log("brand", brand);
+    getBrandSubmissions(brand);
+  }, [brand, dispatch]);
+
+  useEffect(() => {
     const fetchAllPreviews = async () => {
-      const previews: { [key: string]: { title: string, imageUrl: string } } = {};
-      for (const submission of submissions) {
+      const previews: {
+        [key: string]: { title: string; imageUrl: string; description: string };
+      } = {};
+      for (const submission of localSubmissions) {
         if (!contentPreviews[submission.contentLink]) {
-          const preview = await fetchContentPreview(submission.contentLink);
+          const preview = await fetchSocialMediaPreview(submission.contentLink);
           previews[submission.contentLink] = preview;
         }
       }
@@ -83,7 +77,7 @@ const SubmissionApproval = () => {
     };
 
     fetchAllPreviews();
-  }, [submissions, contentPreviews]);
+  }, [localSubmissions]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -91,104 +85,58 @@ const SubmissionApproval = () => {
         Submissions
       </Typography>
 
-      {/* Tabs */}
-      <Tabs value={tabValue} onChange={handleTabChange} aria-label="Submission Status">
-        <Tab label="All" />
-        <Tab label="Approved" />
-        <Tab label="Rejected" />
-        <Tab label="Pending" />
-      </Tabs>
+      {localLoading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+        >
+          <CircularProgress />
+        </Box>
+      ) : localSubmissions.length === 0 ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+        >
+          <Typography variant="h6" color="text.secondary">
+            No submissions found for this brand.
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          {/* Tabs */}
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="Submission Status"
+          >
+            <Tab label="All" />
+            <Tab label="Approved" />
+            <Tab label="Rejected" />
+            <Tab label="Pending" />
+          </Tabs>
 
-      {/* Submissions */}
-      <Grid container spacing={3} sx={{ mt: 2 }}>
-        {filterSubmissions(tabValue === 0 ? 'all' : ['approved', 'rejected', 'pending'][tabValue - 1]).map((submission) => (
-          <Grid item xs={12} md={4} key={submission.id}>
-            <Card sx={{ boxShadow: 2 }}>
-              <CardContent>
-                <Box display="flex" alignItems="center">
-                  <Avatar sx={{ mr: 2 }}>JD</Avatar>
-                  <Box>
-                    <Typography variant="h6">{submission.influencer}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {submission.campaignName} - {new Date(submission.date).toLocaleDateString()}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="body2" color="text.secondary" noWrap>
-                  <Tooltip title={submission.contentLink} placement="top">
-                    <a href={submission.contentLink} target="_blank" rel="noopener noreferrer">
-                      {submission.contentLink}
-                    </a>
-                  </Tooltip>
-                </Typography>
-
-                {/* Content Link Preview */}
-                <Box mt={2} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  {contentPreviews[submission.contentLink] && (
-                    <>
-                      <img
-                        src={contentPreviews[submission.contentLink].imageUrl}
-                        alt={contentPreviews[submission.contentLink].title}
-                        style={{ width: 50, height: 50, objectFit: 'cover' }}
-                      />
-                      <Typography variant="body2" fontWeight="bold">
-                        {contentPreviews[submission.contentLink].title}
-                      </Typography>
-                    </>
-                  )}
-                </Box>
-
-                {/* Engagement (Likes & Comments) */}
-                <Box mt={2} display="flex" gap={2}>
-                  <Tooltip title="Likes">
-                    <IconButton>
-                      <ThumbUp color="primary" />
-                      <Typography variant="body2">{submission.likes}</Typography>
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Comments">
-                    <IconButton>
-                      <Comment color="primary" />
-                      <Typography variant="body2">{submission.comments}</Typography>
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-
-                {/* Action Buttons */}
-                <Box mt={2} display="flex" gap={1}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => handleStatusChange(submission.id, 'approved')}
-                    disabled={submission.status !== 'pending'}
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleStatusChange(submission.id, 'rejected')}
-                    disabled={submission.status !== 'pending'}
-                  >
-                    Reject
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    onClick={() => handleStatusChange(submission.id, 'denied')}
-                    disabled={submission.status !== 'pending'}
-                  >
-                    Deny
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
+          {/* Submissions */}
+          <Grid container spacing={3} sx={{ mt: 2 }}>
+            {filterSubmissions(
+              tabValue === 0
+                ? "all"
+                : ["approved", "rejected", "pending"][tabValue - 1],
+            ).map((submission) => (
+              <Grid item xs={12} md={4} key={submission.id}>
+                <ApprovalCard
+                  submission={submission}
+                  contentPreview={contentPreviews[submission.contentLink]}
+                  onStatusChange={handleStatusChange}
+                />
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
+        </>
+      )}
     </Box>
   );
-};
-
-export default SubmissionApproval;
+}

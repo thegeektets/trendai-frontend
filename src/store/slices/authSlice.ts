@@ -27,9 +27,6 @@ export const loginUser = createAsyncThunk(
       localStorage.removeItem("token");
 
       const response = await apiRequest("auth/login", "POST", userData);
-
-      console.log("response", response);
-
       localStorage.setItem("token", response.accessToken || null);
       localStorage.setItem("user", JSON.stringify(response.user));
 
