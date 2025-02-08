@@ -37,8 +37,9 @@ const drawerWidth = 240;
 
 export default function Dashboard() {
   const [role, setRole] = useState<string | null>(null);
-  const [userDetails, setUserDetails] = useState<any>(null); // Add state for user profile
   const [selectedPage, setSelectedPage] = useState<string>("Campaign List");
+
+  const [userDetails, setUserDetails] = useState<any>(null); // Add state for user profile
   const router = useRouter();
 
   useEffect(() => {
@@ -56,7 +57,21 @@ export default function Dashboard() {
 
     setRole(parsedUser.role);
     setUserDetails(parsedUser.profile);
-  }, [router]);
+
+    // Check if query is available and contains 'page' before using it
+    if (router.query && router.query.page) {
+      const { page } = router.query;
+      const formattedPage = page.replace(/-/g, " "); // Convert hyphenated URL to space
+      setSelectedPage(formattedPage);
+    } else {
+      const defaultPage =
+        parsedUser.role === "influencer" ? "Campaign List" : "Influencer List";
+      const formattedDefaultPage = defaultPage
+        .replace(/\s+/g, "-")
+        .toLowerCase(); // Convert to hyphenated URL
+      router.push(`/dashboard?page=${formattedDefaultPage}`);
+    }
+  }, [router.query]);
 
   const influencerMenu = [
     { text: "Campaign List", icon: <Campaign /> },
@@ -73,27 +88,36 @@ export default function Dashboard() {
 
   const menuItems = role === "influencer" ? influencerMenu : brandMenu;
 
+  const handleMenuClick = (text: string) => {
+    setSelectedPage(text);
+
+    // Convert the page text to hyphenated URL
+    const hyphenatedText = text.replace(/\s+/g, "-").toLowerCase();
+    router.push(`/dashboard?page=${hyphenatedText}`);
+  };
+
   const renderPage = () => {
-    switch (selectedPage) {
-      case "Campaign List":
+    const formattedPage = selectedPage.replace(/\s+/g, "-").toLowerCase(); // Convert to hyphenated URL format
+    switch (formattedPage) {
+      case "campaign-list":
         return <CampaignList />;
-      case "Campaign Details":
+      case "campaign-details":
         return <CampaignDetails />;
-      case "Performance Snapshot":
+      case "performance-snapshot":
         return <PerformanceSnapshot />;
-      case "Influencer List":
+      case "influencer-list":
         return <InfluencerList />;
-      case "Submission Approval":
+      case "submission-approval":
         return <SubmissionApproval />;
-      case "Campaign Snapshot":
+      case "campaign-snapshot":
         return <SnapshotPage />;
-      case "Add Campaign":
-        return <AddCampaign />;
+      case "add-campaign":
+        return <AddCampaign brand={userDetails._id} />;
       default:
         return <Typography variant="h6">Select a page</Typography>;
     }
   };
-
+  
   const renderUserProfile = () => {
     if (role === "influencer" && userDetails) {
       return (
@@ -184,7 +208,7 @@ export default function Dashboard() {
               <ListItem
                 button
                 key={text}
-                onClick={() => setSelectedPage(text)}
+                onClick={() => handleMenuClick(text)} // Use the handle function to update the URL
                 sx={{
                   "&:hover": {
                     backgroundColor: "rgba(255, 255, 255, 0.2)",

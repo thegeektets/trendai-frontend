@@ -40,7 +40,6 @@ const influencerSlice = createSlice({
       })
       .addCase(setupInfluencerProfile.fulfilled, (state, action) => {
         state.loading = false;
-        console.log("action", action);
         state.profile = action.payload;
       })
       .addCase(setupInfluencerProfile.rejected, (state, action) => {
