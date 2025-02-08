@@ -31,9 +31,8 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem("accessToken", response.token); // Store token
       return response;
     } catch (error: any) {
-      return rejectWithValue(
-        error.message || "Login failed. Please try again.",
-      );
+      const errorMessage = error.message || "Login failed. Please try again.";
+      return rejectWithValue(errorMessage);
     }
   },
 );
@@ -49,9 +48,8 @@ export const signupUser = createAsyncThunk(
       const response = await apiRequest("users/register", "POST", userData);
       return response;
     } catch (error: any) {
-      return rejectWithValue(
-        error.message || "Signup failed. Please try again.",
-      );
+      const errorMessage = error.message || "Signup failed. Please try again.";
+      return rejectWithValue(errorMessage);
     }
   },
 );

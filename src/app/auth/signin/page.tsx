@@ -1,4 +1,7 @@
 "use client";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { clearAuthError } from "@/store/slices/authSlice";
 
 import { Box, Typography, Link as MuiLink } from "@mui/material";
 import Image from "next/image";
@@ -6,8 +9,15 @@ import Link from "next/link";
 import Signin from "@/components/Auth/Signin";
 import logo from "@/assets/logo.png";
 import gridImage from "@/assets/grids/grid-02.svg";
+import { AppDispatch } from "@/store";
 
 export default function SignIn() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, [dispatch]);
+
   return (
     <Box
       display="flex"

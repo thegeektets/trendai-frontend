@@ -16,15 +16,25 @@ export async function apiRequest(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
 
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.statusText}`);
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      // Extract message from API response if available
+      const errorMessage =
+        responseData?.message || response.statusText || "An error occurred.";
+      throw new Error(errorMessage);
+    }
+
+    return responseData;
+  } catch (error: any) {
+    // Ensure we always return a meaningful error
+    throw new Error(error.message || "Network error, please try again.");
   }
-
-  return response.json();
 }
