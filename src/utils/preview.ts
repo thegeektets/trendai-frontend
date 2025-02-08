@@ -19,8 +19,11 @@ export async function fetchSocialMediaPreview(contentLink: string) {
     return {
       title: data.title || "No title available",
       imageUrl: data.image || "",
-      description: data.description || "No description available",
-    };
+      description: data.description
+      ? data.description.length > 100
+        ? data.description.slice(0, 100) + "..."
+        : data.description
+      : "No description available",    };
   } catch (error) {
     console.error("Error fetching social media preview:", error);
     return {

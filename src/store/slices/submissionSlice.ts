@@ -16,6 +16,25 @@ const initialState: SubmissionState = {
   error: null,
 };
 
+// Async thunk to update a submission by ID
+export const updateSubmission = createAsyncThunk(
+  "submission/updateSubmission",
+  async (
+    { id, status, approver }: { id: string; status: string; approver: string },
+    thunkAPI,
+  ) => {
+    try {
+      const response = await apiRequest(`submissions/${id}`, "PUT", {
+        status,
+        approver,
+      });
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  },
+);
+
 // Async thunk for submission
 export const submitSubmission = createAsyncThunk(
   "submission/submitSubmission",
@@ -95,7 +114,8 @@ const submissionSlice = createSlice({
       .addCase(fetchSubmissionsByBrand.rejected, (state, action: any) => {
         state.loading = false;
         state.error =
-          action.payload || "Failed to fetch submissions by brand. Please try again.";
+          action.payload ||
+          "Failed to fetch submissions by brand. Please try again.";
       })
 
       // Handle fetchSubmissionsByInfluencer
@@ -111,7 +131,16 @@ const submissionSlice = createSlice({
       .addCase(fetchSubmissionsByInfluencer.rejected, (state, action: any) => {
         state.loading = false;
         state.error =
-          action.payload || "Failed to fetch submissions by influencer. Please try again.";
+          action.payload ||
+          "Failed to fetch submissions by influencer. Please try again.";
+      })
+      .addCase(updateSubmission.fulfilled, (state, action: any) => {
+        state.submissions = state.submissions.map((submission) =>
+          submission.id === action.payload.id ? action.payload : submission,
+        );
+      })
+      .addCase(updateSubmission.rejected, (state, action: any) => {
+        state.error = action.payload || "Failed to update submission";
       });
   },
 });

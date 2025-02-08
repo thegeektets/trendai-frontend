@@ -30,15 +30,27 @@ const drawerWidth = 240;
 // Lazy load components
 const CampaignList = dynamic(
   () => import("@/components/Influencer/CampaignList"),
+  {
+    ssr: false,
+  },
 );
 const PerformanceSnapshot = dynamic(
   () => import("@/components/Influencer/PerformanceSnapshot"),
+  {
+    ssr: false,
+  },
 );
 const InfluencerList = dynamic(
   () => import("@/components/Brand/InfluencerList"),
+  {
+    ssr: false,
+  },
 );
 const SubmissionApproval = dynamic(
   () => import("@/components/Brand/SubmissionApproval"),
+  {
+    ssr: false,
+  },
 );
 const AddCampaign = dynamic(() => import("@/components/Brand/AddCampaign"));
 
@@ -63,7 +75,7 @@ export default function Dashboard() {
     }
 
     setRole(parsedUser.role);
-    setUserDetails(parsedUser.profile);
+    setUserDetails({ userId: parsedUser._id, ...parsedUser.profile });
 
     // Set the selected page based on the query or default
     const queryPage = router.query?.page;
@@ -118,7 +130,12 @@ export default function Dashboard() {
       case "influencers":
         return <InfluencerList brand={userDetails?._id} />;
       case "submissions":
-        return <SubmissionApproval brand={userDetails?._id} />;
+        return (
+          <SubmissionApproval
+            user={userDetails?._id}
+            brand={userDetails?._id}
+          />
+        );
       case "new-campaign":
         return <AddCampaign brand={userDetails?._id} />;
       default:

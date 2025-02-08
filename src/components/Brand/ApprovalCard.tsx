@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
   Box,
@@ -11,17 +12,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { ThumbUp, Comment } from "@mui/icons-material";
-
-interface Submission {
-  id: string;
-  contentLink: string;
-  influencer: string;
-  status: string;
-  date: string;
-  campaignName: string;
-  likes: number;
-  comments: number;
-}
+import Image from "next/image";
 
 interface ContentPreview {
   title: string;
@@ -30,7 +21,7 @@ interface ContentPreview {
 }
 
 interface ApprovalCardProps {
-  submission: Submission;
+  submission: any;
   contentPreview?: ContentPreview;
   onStatusChange: (submissionId: string, status: string) => void;
 }
@@ -45,12 +36,22 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({
       <CardContent>
         {/* Influencer Info */}
         <Box display="flex" alignItems="center">
-          <Avatar sx={{ mr: 2 }}>JD</Avatar>
+          <Avatar sx={{ mr: 2 }}>
+            {submission.influencer_name.charAt(0).toUpperCase()}
+          </Avatar>
           <Box>
-            <Typography variant="h6">{submission.influencer}</Typography>
+            <Typography variant="h6">{submission.influencer_name}</Typography>
+            <Typography variant="caption">
+              {submission.influencer_platform} |{" "}
+              {submission.influencer_socialMediaHandle} |{" "}
+              {submission.influencer_followersCount}
+            </Typography>
+
             <Typography variant="body2" color="text.secondary">
-              {submission.campaignName} -{" "}
-              {new Date(submission.date).toLocaleDateString()}
+              {submission.campaign_name}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {submission.campaign_description}
             </Typography>
           </Box>
         </Box>
@@ -76,10 +77,11 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({
         <Box mt={2} sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {contentPreview && (
             <>
-              <img
+              <Image
+                width={150}
+                height={150}
                 src={contentPreview.imageUrl}
                 alt={contentPreview.title}
-                style={{ width: 50, height: 50, objectFit: "cover" }}
               />
               <Box>
                 <Typography variant="body2" fontWeight="bold">
@@ -99,7 +101,7 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({
             <IconButton>
               <ThumbUp color="primary" />
               <Typography variant="body2" sx={{ ml: 1 }}>
-                {submission.likes}
+                {submission.engagement_likes}
               </Typography>
             </IconButton>
           </Tooltip>
@@ -107,7 +109,7 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({
             <IconButton>
               <Comment color="primary" />
               <Typography variant="body2" sx={{ ml: 1 }}>
-                {submission.comments}
+                {submission.engagement_comments}
               </Typography>
             </IconButton>
           </Tooltip>
@@ -118,7 +120,7 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({
           <Button
             variant="contained"
             color="success"
-            onClick={() => onStatusChange(submission.id, "approved")}
+            onClick={() => onStatusChange(submission._id, "approved")}
             disabled={submission.status !== "pending"}
           >
             Approve
@@ -126,19 +128,21 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({
           <Button
             variant="contained"
             color="error"
-            onClick={() => onStatusChange(submission.id, "rejected")}
+            onClick={() => onStatusChange(submission._id, "rejected")}
             disabled={submission.status !== "pending"}
           >
             Reject
           </Button>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => onStatusChange(submission.id, "denied")}
-            disabled={submission.status !== "pending"}
-          >
-            Deny
-          </Button>
+
+          {submission.status !== "pending" && (
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() => onStatusChange(submission._id, "pending")}
+            >
+              Pending
+            </Button>
+          )}
         </Box>
       </CardContent>
     </Card>

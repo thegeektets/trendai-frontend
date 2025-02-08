@@ -8,14 +8,24 @@ import {
   Tabs,
   Grid,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import ApprovalCard from "./ApprovalCard"; // Import the ApprovalCard component
 import { fetchSocialMediaPreview } from "@/utils/preview";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/store";
-import { fetchSubmissionsByBrand } from "@/store/slices/submissionSlice";
+import {
+  fetchSubmissionsByBrand,
+  updateSubmission,
+} from "@/store/slices/submissionSlice";
 
-export default function SubmissionApproval({ brand }: { brand: string }) {
+export default function SubmissionApproval({
+  brand,
+  user,
+}: {
+  brand: string;
+  user: string;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const [tabValue, setTabValue] = useState(0);
   const [localSubmissions, setLocalSubmissions] = useState<any[]>([]);
@@ -25,18 +35,50 @@ export default function SubmissionApproval({ brand }: { brand: string }) {
   const { loading, submissions } = useSelector(
     (state: any) => state.submission,
   );
-  const [localLoading, setLocalLoading] = useState<boolean>(false);
+  const [localError, setLocalError] = useState<string | null>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [localLoading, setLocalLoading] = useState<boolean>(false); // Local loading state
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const handleStatusChange = (submissionId: string, status: string) => {
-    setSubmissions((prevSubmissions) =>
-      prevSubmissions.map((submission) =>
-        submission.id === submissionId ? { ...submission, status } : submission,
-      ),
+  const handleStatusChange = async (submissionId: string, status: string) => {
+    const result = await dispatch(
+      updateSubmission({ id: submissionId, status: status, approver: user }),
     );
+    console.log("result", result);
+
+    if (result?.error) {
+      setLocalError(result?.payload?.message);
+
+      // Clear error message after 3 seconds
+      const errorTimeout = setTimeout(() => {
+        setLocalError(null);
+      }, 10000);
+
+      return () => clearTimeout(errorTimeout); // Cleanup on re-render
+    } else {
+      setSuccessMessage(
+        `Submission has been updated to ${status} successfully`,
+      );
+
+      setLocalSubmissions((prevSubmissions) =>
+        prevSubmissions.map((submission) =>
+          submission.id === submissionId
+            ? { ...submission, status }
+            : submission,
+        ),
+      );
+
+      // Clear success message after 3 seconds
+      const successTimeout = setTimeout(() => {
+        setSuccessMessage(null);
+        getBrandSubmissions(brand);
+      }, 3000);
+
+      return () => clearTimeout(successTimeout); // Cleanup on re-render
+    }
   };
 
   const filterSubmissions = (status: string) => {
@@ -107,6 +149,16 @@ export default function SubmissionApproval({ brand }: { brand: string }) {
         </Box>
       ) : (
         <>
+          {successMessage && (
+            <Alert severity="success" sx={{ width: "100%", mb: 2 }}>
+              {successMessage}
+            </Alert>
+          )}
+          {localError && (
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+              {localError}
+            </Alert>
+          )}
           {/* Tabs */}
           <Tabs
             value={tabValue}
@@ -126,7 +178,7 @@ export default function SubmissionApproval({ brand }: { brand: string }) {
                 ? "all"
                 : ["approved", "rejected", "pending"][tabValue - 1],
             ).map((submission) => (
-              <Grid item xs={12} md={4} key={submission.id}>
+              <Grid item xs={12} md={4} key={submission._id}>
                 <ApprovalCard
                   submission={submission}
                   contentPreview={contentPreviews[submission.contentLink]}
