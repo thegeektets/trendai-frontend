@@ -56,6 +56,10 @@ export const signupUser = createAsyncThunk(
   },
 );
 
+export const clearAuthError = () => (dispatch: any) => {
+  dispatch(authSlice.actions.clearError());
+};
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -66,6 +70,9 @@ const authSlice = createSlice({
       state.error = null;
       state.loading = false;
       localStorage.removeItem("accessToken"); // Clear token on logout
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
