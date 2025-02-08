@@ -62,9 +62,6 @@ export function UserInfo({ userDetails }: UserInfoProps) {
             <Typography variant="body2" color="text.secondary" sx={{ px: 2 }}>
               {userDetails.email}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ px: 2 }}>
-              Role: {userDetails.role}
-            </Typography>
 
             {/* Show additional details based on role */}
             {userDetails.role === "influencer" && (
@@ -101,15 +98,8 @@ export function UserInfo({ userDetails }: UserInfoProps) {
               </>
             )}
 
-            {userDetails.role === "company" && (
+            {userDetails.role === "brand" && (
               <>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ px: 2 }}
-                >
-                  Company: {userDetails.companyName}
-                </Typography>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -122,23 +112,7 @@ export function UserInfo({ userDetails }: UserInfoProps) {
                   color="text.secondary"
                   sx={{ px: 2 }}
                 >
-                  Industry: {userDetails.companyWebsite}
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ px: 2 }}
-                >
-                  Description: {userDetails.companyDescription}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ px: 2 }}
-                >
-                  Account Created:{" "}
-                  {new Date(userDetails.createdAt!).toLocaleDateString()}
+                  {userDetails.companyWebsite}
                 </Typography>
               </>
             )}

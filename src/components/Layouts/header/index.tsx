@@ -10,6 +10,8 @@ export function Header() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    console.log("storedUser", storedUser);
+    
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       const userData = {

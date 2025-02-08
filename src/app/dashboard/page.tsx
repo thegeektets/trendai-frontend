@@ -130,13 +130,11 @@ export default function Dashboard() {
         >
           <Typography variant="h6">{userDetails.name}</Typography>
           <Typography variant="body2">
-            Company: {userDetails.companyName}
-          </Typography>
-          <Typography variant="body2">
             Industry: {userDetails.industry}
           </Typography>
+          <Typography variant="body2">{userDetails.website}</Typography>
           <Typography variant="body2">
-            Founded: {new Date(userDetails.foundedAt).toLocaleDateString()}
+            Created: {new Date(userDetails.createdAt).toLocaleDateString()}
           </Typography>
         </Box>
       );
