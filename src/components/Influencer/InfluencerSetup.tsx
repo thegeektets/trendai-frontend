@@ -81,7 +81,7 @@ export default function InfluencerSetup({
       setSuccessMessage("Profile setup successful! Redirecting...");
       setTimeout(() => {
         router.push("/dashboard");
-      }, 2000);
+      }, 1000);
     }
   };
 

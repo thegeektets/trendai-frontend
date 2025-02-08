@@ -1,7 +1,6 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
-import { SidebarProvider } from "@/components/Layouts/sidebar/sidebar-context";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { ReactNode } from "react";
 import { Provider } from "react-redux";
@@ -29,9 +28,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
       <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <SidebarProvider>{children}</SidebarProvider>
-        </ThemeProvider>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
       </Provider>
     </SessionProvider>
   );

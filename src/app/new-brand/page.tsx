@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { Box, Typography, Link as MuiLink, Alert } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import BrandSetup from "@/components/Brand/Setup";
+import BrandSetup from "@/components/Brand/BrandSetup";
 import logo from "@/assets/logo.png";
 import gridImage from "@/assets/grids/grid-02.svg";
 import { AppDispatch } from "@/store";
@@ -23,13 +23,13 @@ export default function NewBrand() {
       const storedToken = localStorage.getItem("token");
       if (!storedToken || storedToken === "undefined") {
         setError("Token not found. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 2000);
+        setTimeout(() => router.push("/auth/signin"), 100);
         return;
       }
       const storedUser = localStorage.getItem("user");
       if (!storedUser) {
         setError("User not found. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 2000);
+        setTimeout(() => router.push("/auth/signin"), 1000);
         return;
       }
 
@@ -37,20 +37,25 @@ export default function NewBrand() {
 
       if (!parsedUser.id || !parsedUser.email) {
         setError("Invalid user data. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 2000);
+        setTimeout(() => router.push("/auth/signin"), 1000);
         return;
       }
 
       setUserId(parsedUser.id);
     } catch (err) {
       setError("Failed to parse user data. Redirecting...");
-      setTimeout(() => router.push("/auth/signin"), 2000);
+      setTimeout(() => router.push("/auth/signin"), 1000);
     }
   }, [dispatch, router]);
 
   if (error) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
         <Alert severity="error">{error}</Alert>
       </Box>
     );
@@ -61,8 +66,19 @@ export default function NewBrand() {
   }
 
   return (
-    <Box display="flex" flexDirection={{ xs: "column", md: "row" }} minHeight="100vh">
-      <Box flex={1} display="flex" alignItems="center" justifyContent="center" p={6} sx={{ backgroundColor: "#fff", fontFamily: "Satoshi" }}>
+    <Box
+      display="flex"
+      flexDirection={{ xs: "column", md: "row" }}
+      minHeight="100vh"
+    >
+      <Box
+        flex={1}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        p={6}
+        sx={{ backgroundColor: "#fff", fontFamily: "Satoshi" }}
+      >
         <Box width="100%" maxWidth={400} paddingTop={"60px"}>
           <BrandSetup user_id={userId} />
         </Box>
@@ -77,12 +93,18 @@ export default function NewBrand() {
         textAlign="center"
         sx={{
           fontFamily: "Satoshi, sans-serif",
-          background: "linear-gradient(145deg, #5750F1 0%, #ff4081 80%, #FFB101 100%)",
+          background:
+            "linear-gradient(145deg, #5750F1 0%, #ff4081 80%, #FFB101 100%)",
           color: "white",
           p: { xs: 4, md: 6 },
         }}
       >
-        <MuiLink component={Link} href="/" sx={{ display: "block", mb: 2 }} marginTop={"60px"}>
+        <MuiLink
+          component={Link}
+          href="/"
+          sx={{ display: "block", mb: 2 }}
+          marginTop={"60px"}
+        >
           <Image src={logo} alt="Logo" width={176} />
         </MuiLink>
 
@@ -99,7 +121,12 @@ export default function NewBrand() {
         </Typography>
 
         <Box mt={4}>
-          <Image src={gridImage} alt="Background Illustration" width={405} height={325} />
+          <Image
+            src={gridImage}
+            alt="Background Illustration"
+            width={405}
+            height={325}
+          />
         </Box>
       </Box>
     </Box>

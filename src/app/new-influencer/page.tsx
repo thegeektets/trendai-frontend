@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { Box, Typography, Link as MuiLink, Alert } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import BrandSetup from "@/components/Brand/Setup";
+import BrandSetup from "@/components/Brand/BrandSetup";
 import logo from "@/assets/logo.png";
 import gridImage from "@/assets/grids/grid-02.svg";
 import { AppDispatch } from "@/store";
