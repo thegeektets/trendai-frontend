@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import { signupUser } from "@/store/slices/authSlice";
 import {
   TextField,
   Button,
@@ -10,12 +13,25 @@ import {
   Typography,
   CircularProgress,
   Link as MuiLink,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
-import { Email as EmailIcon, Lock as PasswordIcon } from "@mui/icons-material";
+import {
+  Email as EmailIcon,
+  Lock as PasswordIcon,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 import Link from "next/link";
 
 export default function Signup() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error } = useSelector((state: RootState) => state.auth);
+
   const [userType, setUserType] = useState<"influencer" | "brand" | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -36,23 +52,26 @@ export default function Signup() {
 
   // Validate a single field
   const validateField = (name: string, value: string) => {
-    let newErrors = { ...errors };
+    const newErrors = { ...errors };
 
     if (name === "email") {
       if (!value) newErrors.email = "Email is required";
-      else if (!/\S+@\S+\.\S+/.test(value)) newErrors.email = "Enter a valid email";
+      else if (!/\S+@\S+\.\S+/.test(value))
+        newErrors.email = "Enter a valid email";
       else delete newErrors.email;
     }
 
     if (name === "password") {
       if (!value) newErrors.password = "Password is required";
-      else if (value.length < 6) newErrors.password = "Password must be at least 6 characters";
+      else if (value.length < 6)
+        newErrors.password = "Password must be at least 6 characters";
       else delete newErrors.password;
     }
 
     if (name === "confirmPassword") {
       if (!value) newErrors.confirmPassword = "Please confirm your password";
-      else if (value !== data.password) newErrors.confirmPassword = "Passwords do not match";
+      else if (value !== data.password)
+        newErrors.confirmPassword = "Passwords do not match";
       else delete newErrors.confirmPassword;
     }
 
@@ -61,7 +80,7 @@ export default function Signup() {
 
   // Validate all fields before submission
   const validate = () => {
-    let newErrors: { [key: string]: string } = {};
+    const newErrors: { [key: string]: string } = {};
 
     validateField("email", data.email);
     validateField("password", data.password);
@@ -152,7 +171,7 @@ export default function Signup() {
             <TextField
               fullWidth
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={data.password}
               onChange={handleChange}
@@ -160,13 +179,25 @@ export default function Signup() {
               margin="normal"
               error={!!errors.password}
               helperText={errors.password}
-              InputProps={{ startAdornment: <PasswordIcon color="disabled" /> }}
+              InputProps={{
+                startAdornment: <PasswordIcon color="disabled" />,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <TextField
               fullWidth
               label="Confirm Password"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
               value={data.confirmPassword}
               onChange={handleChange}
@@ -174,7 +205,21 @@ export default function Signup() {
               margin="normal"
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword}
-              InputProps={{ startAdornment: <PasswordIcon color="disabled" /> }}
+              InputProps={{
+                startAdornment: <PasswordIcon color="disabled" />,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <Box display="flex" alignItems="center" mt={2}>
@@ -199,7 +244,11 @@ export default function Signup() {
               sx={{ mt: 3, py: 1.5 }}
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : "Sign Up"}
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Sign Up"
+              )}
             </Button>
 
             <Typography variant="body2" mt={3}>
