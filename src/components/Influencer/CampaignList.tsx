@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +28,7 @@ interface Campaign {
 
 export default function CampaignList() {
   const dispatch = useDispatch<AppDispatch>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { loading, campaigns } = useSelector((state: any) => state.campaign);
   const [localCampaigns, setLocalCampaigns] = useState<Campaign[]>([]);
   const [localLoading, setLocalLoading] = useState<boolean>(false);

@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { createCampaign } from "@/store/slices/campaignSlice"; // Assuming you have a slice for campaigns
-import { useRouter } from "next/navigation";
 import {
   TextField,
   Button,
@@ -68,7 +69,7 @@ export default function AddCampaign({ brand }: AddCampaignProps) {
     setLocalError(null); // Reset any previous errors
     setLocalLoading(true); // Set loading state to true
 
-    const result = await dispatch(
+    const result: any = await dispatch(
       createCampaign({
         name: data.name,
         description: data.description,

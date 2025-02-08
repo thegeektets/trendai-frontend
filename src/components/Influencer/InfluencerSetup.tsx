@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -28,7 +29,8 @@ export default function InfluencerSetup({
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const { loading, error, profile } = useSelector(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { loading, error } = useSelector(
     (state: RootState) => state.influencer,
   );
 
@@ -66,7 +68,7 @@ export default function InfluencerSetup({
     e.preventDefault();
     if (!validate()) return;
 
-    const result = await dispatch(
+    const result: any = await dispatch(
       setupInfluencerProfile({
         user: user_id,
         name: data.name,

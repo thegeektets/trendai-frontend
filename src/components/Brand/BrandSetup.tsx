@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -56,7 +57,7 @@ export default function BrandSetup({ user_id }: BrandSetupProps) {
     e.preventDefault();
     if (!validate()) return;
 
-    const result = await dispatch(
+    const result:any = await dispatch(
       setupBrandProfile({
         users: [user_id],
         name: data.name,
@@ -66,7 +67,6 @@ export default function BrandSetup({ user_id }: BrandSetupProps) {
       }),
     );
 
-    console.log("result", result);
 
     if (!result?.error) {
       setSuccessMessage("Brand profile setup successful! Redirecting...");

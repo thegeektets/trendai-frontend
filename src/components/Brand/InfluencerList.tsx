@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -47,7 +49,7 @@ interface Submission {
 
 export default function InfluencerList({ brand }: { brand: string }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, campaigns } = useSelector((state: any) => state.campaign); // Extract campaigns from state
+  const { loading, campaigns } = useSelector((state: any) => state.campaign);
   const [localCampaigns, setLocalCampaigns] = useState<Campaign[]>([]);
   const [localLoading, setLocalLoading] = useState<boolean>(false);
 
@@ -68,7 +70,7 @@ export default function InfluencerList({ brand }: { brand: string }) {
 
   return (
     <Box p={3}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
         Campaigns
       </Typography>
 
@@ -138,10 +140,13 @@ export default function InfluencerList({ brand }: { brand: string }) {
                     </Typography>
                   ) : (
                     <Grid container spacing={2}>
-                      {campaign.influencers.map((influencer) => {
+                      {campaign.influencers.map((influencer: any) => {
                         const { submissions } = influencer;
                         const statusCounts = submissions.reduce(
-                          (acc, submission) => {
+                          (
+                            acc: { [x: string]: any },
+                            submission: { status: string | number },
+                          ) => {
                             acc[submission.status] =
                               (acc[submission.status] || 0) + 1;
                             return acc;
@@ -150,7 +155,10 @@ export default function InfluencerList({ brand }: { brand: string }) {
                         );
 
                         const latestSubmission = submissions.reduce(
-                          (latest, current) =>
+                          (
+                            latest: { date: string | number | Date },
+                            current: { date: string | number | Date },
+                          ) =>
                             new Date(current.date) > new Date(latest.date)
                               ? current
                               : latest,

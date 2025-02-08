@@ -17,7 +17,7 @@ import { AppDispatch } from "@/store";
 
 interface AddSubmissionProps {
   campaign: {
-    id: string;
+    _id: string;
     name: string;
   };
   influencerId: string;
@@ -30,6 +30,7 @@ export default function AddSubmission({
   onClose,
 }: AddSubmissionProps) {
   const dispatch = useDispatch<AppDispatch>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { loading, submission, error } = useSelector(
     (state: any) => state.submission,
   );
@@ -87,18 +88,18 @@ export default function AddSubmission({
         submitSubmission(submissionData),
       ).unwrap();
       console.log("response", response);
-      if(response?.error){
+      if (response?.error) {
         setLocalError(response?.error || "An error occured");
       } else {
         setLocalSuccess("Submission successful");
         setTimeout(() => {
           onClose();
-        }, 1000); 
+        }, 1000);
       }
-    } catch (err) {
+    } catch (err: any) {
       // Handle any error from the async action
       console.error("Submission failed:", err);
-      setLocalError(err.message)
+      setLocalError(err.message);
     }
   };
 

@@ -15,6 +15,7 @@ import {
   CssBaseline,
   Divider,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import CampaignList from "@/components/Influencer/CampaignList";
 import PerformanceSnapshot from "@/components/Influencer/PerformanceSnapshot";
@@ -35,7 +36,7 @@ const drawerWidth = 240;
 
 export default function Dashboard() {
   const [role, setRole] = useState<string | null>(null);
-  const [selectedPage, setSelectedPage] = useState<string>("Campaigns");
+  const [selectedPage, setSelectedPage] = useState<string>("Campaign");
 
   const [userDetails, setUserDetails] = useState<any>(null); // Add state for user profile
   const router = useRouter();
@@ -93,13 +94,12 @@ export default function Dashboard() {
   };
 
   const renderPage = () => {
-    const formattedPage = selectedPage.replace(/\s+/g, "-").toLowerCase(); // Convert to hyphenated URL format
+    const formattedPage = selectedPage.replace(/\s+/g, "-").toLowerCase();
     switch (formattedPage) {
       case "campaigns":
         return <CampaignList />;
       case "performance":
         return <PerformanceSnapshot />;
-
       case "influencers":
         return <InfluencerList brand={userDetails._id} />;
       case "submissions":
@@ -107,10 +107,20 @@ export default function Dashboard() {
       case "new-campaign":
         return <AddCampaign brand={userDetails._id} />;
       default:
-        return <Typography variant="h6">Select a page</Typography>;
+        return (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="200px"
+          >
+            <Typography variant="h6" color="text.secondary">
+              Page not found.
+            </Typography>
+          </Box>
+        );
     }
   };
-
   const renderUserProfile = () => {
     if (role === "influencer" && userDetails) {
       return (
@@ -201,7 +211,7 @@ export default function Dashboard() {
               <ListItem
                 button
                 key={text}
-                onClick={() => handleMenuClick(text)} // Use the handle function to update the URL
+                onClick={() => handleMenuClick(text)}
                 sx={{
                   "&:hover": {
                     backgroundColor: "rgba(255, 255, 255, 0.2)",
