@@ -21,7 +21,7 @@ export const signupUser = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const response = await apiRequest("auth/signup", "POST", userData);
+      const response = await apiRequest("users/register", "POST", userData);
       return response;
     } catch (error: any) {
       return rejectWithValue(
@@ -37,6 +37,8 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      state.error = null;
+      state.loading = false; // Reset loading on logout
     },
   },
   extraReducers: (builder) => {

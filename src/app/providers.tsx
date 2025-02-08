@@ -4,6 +4,8 @@ import { SessionProvider } from "next-auth/react";
 import { SidebarProvider } from "@/components/Layouts/sidebar/sidebar-context";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { ReactNode } from "react";
+import { Provider } from "react-redux";
+import { store } from "@/store";
 
 const theme = createTheme({
   palette: {
@@ -26,9 +28,11 @@ interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
-      <ThemeProvider theme={theme}>
-        <SidebarProvider>{children}</SidebarProvider>
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <SidebarProvider>{children}</SidebarProvider>
+        </ThemeProvider>
+      </Provider>
     </SessionProvider>
   );
 }

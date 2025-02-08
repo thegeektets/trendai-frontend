@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { signupUser } from "@/store/slices/authSlice";
+import { useRouter } from "next/navigation";
 import {
   TextField,
   Button,
@@ -13,6 +14,7 @@ import {
   Typography,
   CircularProgress,
   Link as MuiLink,
+  Alert,
   IconButton,
   InputAdornment,
 } from "@mui/material";
@@ -26,12 +28,15 @@ import Link from "next/link";
 
 export default function Signup() {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const router = useRouter();
+
+  const { loading, error, user } = useSelector(
+    (state: RootState) => state.auth,
+  );
 
   const [userType, setUserType] = useState<"influencer" | "brand" | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -39,18 +44,23 @@ export default function Signup() {
     remember: false,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  // Handle input changes and validate in real time
+  useEffect(() => {
+    if (user) {
+      setSuccessMessage("Sign-up successful! Redirecting...");
+      setTimeout(() => {
+        router.push("/dashboard"); // Redirect on success
+      }, 2000);
+    }
+  }, [user, router]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
     setData({ ...data, [name]: value });
-
     validateField(name, value);
   };
 
-  // Validate a single field
   const validateField = (name: string, value: string) => {
     const newErrors = { ...errors };
 
@@ -78,41 +88,42 @@ export default function Signup() {
     setErrors(newErrors);
   };
 
-  // Validate all fields before submission
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
-
     validateField("email", data.email);
     validateField("password", data.password);
     validateField("confirmPassword", data.confirmPassword);
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userType) return;
+    if (!validate()) return;
 
-    if (!validate()) return; // Stop submission if validation fails
-
-    setLoading(true);
-
-    const payload = {
-      ...data,
-      role: userType,
-    };
-
-    console.log("Submitting:", payload);
-
-    setTimeout(() => {
-      setLoading(false);
-      alert("Sign-up successful!");
-    }, 1000);
+    dispatch(
+      signupUser({
+        email: data.email,
+        password: data.password,
+        role: userType,
+      }),
+    );
   };
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
+      {successMessage && (
+        <Alert severity="success" sx={{ width: "100%", mb: 2 }}>
+          {successMessage}
+        </Alert>
+      )}
+      {error && (
+        <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       {!userType ? (
         <Box textAlign="center">
           <Typography variant="h5" fontWeight="bold" mb={3}>
@@ -149,6 +160,7 @@ export default function Signup() {
           <Typography variant="h6" fontWeight="medium" mb={2}>
             Sign up as a {userType}
           </Typography>
+
           <Box
             component="form"
             onSubmit={handleSubmit}
