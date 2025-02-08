@@ -10,8 +10,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token:
-    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null,
+  token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
   loading: false,
   error: null,
 };
@@ -24,11 +23,15 @@ export const loginUser = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
+      localStorage.removeItem("token");
+
       const response = await apiRequest("auth/login", "POST", userData);
 
       console.log("response", response);
 
-      localStorage.setItem("accessToken", response.token); // Store token
+      localStorage.setItem("token", response.accessToken || null);
+      localStorage.setItem("user", JSON.stringify(response.user));
+
       return response;
     } catch (error: any) {
       const errorMessage = error.message || "Login failed. Please try again.";
@@ -67,7 +70,8 @@ const authSlice = createSlice({
       state.token = null;
       state.error = null;
       state.loading = false;
-      localStorage.removeItem("accessToken"); // Clear token on logout
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     },
     clearError: (state) => {
       state.error = null;

@@ -29,7 +29,7 @@ export default function Signin() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { loading, error } = useSelector((state: RootState) => state.auth);
-  
+
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -71,19 +71,47 @@ export default function Signin() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
-    const result = await dispatch(loginUser({ email: data.email, password: data.password }));
+    const result = await dispatch(
+      loginUser({ email: data.email, password: data.password }),
+    );
     if (loginUser.fulfilled.match(result)) {
       setSuccess(true);
-      setTimeout(() => router.push("/dashboard"), 1500);
+      // setTimeout(() => router.push("/dashboard"), 1500);
+      if (
+        result.payload.user.role === "influencer" &&
+        !result.payload.user.profile
+      ) {
+        //setup influencer account
+        setTimeout(() => router.push("/new-influencer"), 1500);
+      } else if (
+        result.payload.user.role === "brand" &&
+        !result.payload.user.profile
+      ) {
+        //setup brand account
+        setTimeout(() => router.push("/new-brand"), 1500);
+      } else {
+        //access dashboard
+        setTimeout(() => router.push("/dashboard"), 1500);
+      }
+
+      console.log("result", result);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%", maxWidth: 400, mx: "auto", mt: 4 }}>
-      <Typography variant="h5" textAlign="center" mb={2}>Sign In</Typography>
-      {success && <Alert severity="success">Login successful! Redirecting...</Alert>}
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ width: "100%", maxWidth: 400, mx: "auto", mt: 4 }}
+    >
+      <Typography variant="h5" textAlign="center" mb={2}>
+        Sign In
+      </Typography>
+      {success && (
+        <Alert severity="success">Login successful! Redirecting...</Alert>
+      )}
       {error && <Alert severity="error">{error}</Alert>}
-      
+
       <TextField
         fullWidth
         label="Email"
@@ -97,7 +125,7 @@ export default function Signin() {
         helperText={errors.email}
         InputProps={{ startAdornment: <EmailIcon color="disabled" /> }}
       />
-      
+
       <TextField
         fullWidth
         label="Password"
@@ -120,18 +148,36 @@ export default function Signin() {
           ),
         }}
       />
-      
+
       <FormControlLabel
-        control={<Checkbox checked={data.remember} onChange={(e) => setData({ ...data, remember: e.target.checked })} />}
+        control={
+          <Checkbox
+            checked={data.remember}
+            onChange={(e) => setData({ ...data, remember: e.target.checked })}
+          />
+        }
         label="Remember me"
       />
-      
-      <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, py: 1.5 }} disabled={loading}>
+
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        color="primary"
+        sx={{ mt: 3, py: 1.5 }}
+        disabled={loading}
+      >
         {loading ? <CircularProgress size={24} color="inherit" /> : "Sign In"}
       </Button>
-      
+
       <Typography variant="body2" mt={3} textAlign="center">
-        Don’t have an account? <Link href="/auth/signup" style={{ color: "primary.main", textDecoration: "none" }}>Sign Up</Link>
+        Don’t have an account?{" "}
+        <Link
+          href="/auth/signup"
+          style={{ color: "primary.main", textDecoration: "none" }}
+        >
+          Sign Up
+        </Link>
       </Typography>
     </Box>
   );

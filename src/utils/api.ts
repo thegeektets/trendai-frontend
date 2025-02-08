@@ -6,11 +6,14 @@ export async function apiRequest(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   body?: any,
 ) {
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("token");
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
+
+  console.log("token", token);
+
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
