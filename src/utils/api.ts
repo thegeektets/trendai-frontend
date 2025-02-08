@@ -5,8 +5,9 @@ export async function apiRequest(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   body?: any,
-  token?: string,
 ) {
+  const token = localStorage.getItem("accessToken");
+
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };

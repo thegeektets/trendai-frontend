@@ -50,7 +50,7 @@ export default function Signup() {
     if (user) {
       setSuccessMessage("Sign-up successful! Redirecting...");
       setTimeout(() => {
-        router.push("/dashboard"); // Redirect on success
+        router.push("/auth/signin"); // Redirect on success
       }, 2000);
     }
   }, [user, router]);

@@ -3,15 +3,40 @@ import { apiRequest } from "../../utils/api";
 
 interface AuthState {
   user: any;
+  token: string | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
+  token:
+    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null,
   loading: false,
   error: null,
 };
+
+// Thunk for login
+export const loginUser = createAsyncThunk(
+  "auth/login",
+  async (
+    userData: { email: string; password: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await apiRequest("auth/login", "POST", userData);
+
+      console.log("response", response);
+
+      localStorage.setItem("accessToken", response.token); // Store token
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.message || "Login failed. Please try again.",
+      );
+    }
+  },
+);
 
 // Thunk for signup
 export const signupUser = createAsyncThunk(
@@ -37,12 +62,27 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      state.token = null;
       state.error = null;
-      state.loading = false; // Reset loading on logout
+      state.loading = false;
+      localStorage.removeItem("accessToken"); // Clear token on logout
     },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
       .addCase(signupUser.pending, (state) => {
         state.loading = true;
         state.error = null;
