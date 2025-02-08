@@ -16,7 +16,6 @@ export default function NewBrand() {
   const router = useRouter();
 
   const [userId, setUserId] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,7 +42,6 @@ export default function NewBrand() {
       }
 
       setUserId(parsedUser.id);
-      setEmail(parsedUser.email);
     } catch (err) {
       setError("Failed to parse user data. Redirecting...");
       setTimeout(() => router.push("/auth/signin"), 2000);
@@ -52,37 +50,21 @@ export default function NewBrand() {
 
   if (error) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
         <Alert severity="error">{error}</Alert>
       </Box>
     );
   }
 
-  if (!userId || !email) {
+  if (!userId) {
     return null;
   }
 
   return (
-    <Box
-      display="flex"
-      flexDirection={{ xs: "column", md: "row" }}
-      minHeight="100vh"
-    >
-      <Box
-        flex={1}
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        p={6}
-        sx={{ backgroundColor: "#fff", fontFamily: "Satoshi" }}
-      >
+    <Box display="flex" flexDirection={{ xs: "column", md: "row" }} minHeight="100vh">
+      <Box flex={1} display="flex" alignItems="center" justifyContent="center" p={6} sx={{ backgroundColor: "#fff", fontFamily: "Satoshi" }}>
         <Box width="100%" maxWidth={400} paddingTop={"60px"}>
-          <BrandSetup user_id={userId} email={email} />
+          <BrandSetup user_id={userId} />
         </Box>
       </Box>
 
@@ -95,17 +77,12 @@ export default function NewBrand() {
         textAlign="center"
         sx={{
           fontFamily: "Satoshi, sans-serif",
-          background: "linear-gradient(135deg, #5750F1 0%, #ff4081 100%)",
+          background: "linear-gradient(145deg, #5750F1 0%, #ff4081 80%, #FFB101 100%)",
           color: "white",
           p: { xs: 4, md: 6 },
         }}
       >
-        <MuiLink
-          component={Link}
-          href="/"
-          sx={{ display: "block", mb: 2 }}
-          marginTop={"60px"}
-        >
+        <MuiLink component={Link} href="/" sx={{ display: "block", mb: 2 }} marginTop={"60px"}>
           <Image src={logo} alt="Logo" width={176} />
         </MuiLink>
 
@@ -122,12 +99,7 @@ export default function NewBrand() {
         </Typography>
 
         <Box mt={4}>
-          <Image
-            src={gridImage}
-            alt="Background Illustration"
-            width={405}
-            height={325}
-          />
+          <Image src={gridImage} alt="Background Illustration" width={405} height={325} />
         </Box>
       </Box>
     </Box>

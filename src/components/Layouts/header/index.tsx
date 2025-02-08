@@ -1,11 +1,10 @@
-import { AppBar, Toolbar, IconButton, InputBase, Box } from "@mui/material";
-import { Menu as MenuIcon, Search as SearchIcon } from "@mui/icons-material";
+import { AppBar, Toolbar, IconButton, Box } from "@mui/material";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import Image from "next/image";
 import Link from "next/link";
 import { useSidebarContext } from "../sidebar/sidebar-context";
-import { Notification } from "./notification";
 import { UserInfo } from "./user-info";
-import logo from "@/assets/logo.png"; // ✅ Import the logo directly
+import logo from "@/assets/logo.png";
 
 interface HeaderProps {
   isLoggedIn: boolean;
@@ -37,22 +36,6 @@ export function Header({ isLoggedIn }: HeaderProps) {
 
         {isLoggedIn && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                bgcolor: "#333",
-                borderRadius: "24px",
-                px: 2,
-                py: 1,
-                color: "white",
-              }}
-            >
-              <SearchIcon sx={{ color: "white" }} />
-              <InputBase placeholder="Search" sx={{ ml: 1, color: "white" }} />
-            </Box>
-
-            <Notification />
             <UserInfo />
           </Box>
         )}
