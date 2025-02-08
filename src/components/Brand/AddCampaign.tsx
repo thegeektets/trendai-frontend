@@ -12,12 +12,7 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
 } from "@mui/material";
-import { Brand } from "@/types"; // Define type for Brand (optional)
 
 interface AddCampaignProps {
   brand: string;
@@ -25,9 +20,13 @@ interface AddCampaignProps {
 
 export default function AddCampaign({ brand }: AddCampaignProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
 
-  const { loading, error } = useSelector((state: RootState) => state.campaign); // Assuming you have a campaign slice
+  // Local state for error handling, success message, and loading state
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [localLoading, setLocalLoading] = useState<boolean>(false); // Local loading state
+
+  const { loading } = useSelector((state: RootState) => state.campaign);
 
   const [data, setData] = useState({
     name: "",
@@ -40,7 +39,6 @@ export default function AddCampaign({ brand }: AddCampaignProps) {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [successMessage, setSuccessMessage] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>,
@@ -51,8 +49,7 @@ export default function AddCampaign({ brand }: AddCampaignProps) {
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!data.name)
-      newErrors.name = "Campaign name is required";
+    if (!data.name) newErrors.name = "Campaign name is required";
     if (!data.description) newErrors.description = "Description is required";
     if (!data.budget || isNaN(Number(data.budget)))
       newErrors.budget = "Valid budget is required";
@@ -68,9 +65,12 @@ export default function AddCampaign({ brand }: AddCampaignProps) {
     e.preventDefault();
     if (!validate()) return;
 
+    setLocalError(null); // Reset any previous errors
+    setLocalLoading(true); // Set loading state to true
+
     const result = await dispatch(
       createCampaign({
-        campaignName: data.name,
+        name: data.name,
         description: data.description,
         budget: Number(data.budget),
         startDate: new Date(data.startDate),
@@ -79,11 +79,14 @@ export default function AddCampaign({ brand }: AddCampaignProps) {
         brand: data.brand,
       }),
     );
+    setLocalLoading(false);
 
-    if (!result?.error) {
+    if (result?.error) {
+      setLocalError(result.error.message);
+    } else {
       setSuccessMessage("Campaign added successfully! Redirecting...");
       setTimeout(() => {
-        router.push("/campaigns"); // Redirect to campaign listing page
+        window.location.href = "/dashboard?page=influencer-list";
       }, 1000);
     }
   };
@@ -91,13 +94,13 @@ export default function AddCampaign({ brand }: AddCampaignProps) {
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
       {successMessage && (
-        <Alert severity="success" sx={{ width: "100%", mb: 2 }}>
+        <Alert severity="success" sx={{ width: "60%", mb: 2 }}>
           {successMessage}
         </Alert>
       )}
-      {error && (
-        <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
-          {error}
+      {localError && (
+        <Alert severity="error" sx={{ width: "60%", mb: 2 }}>
+          {localError}
         </Alert>
       )}
 
@@ -174,9 +177,9 @@ export default function AddCampaign({ brand }: AddCampaignProps) {
           variant="contained"
           color="primary"
           sx={{ mt: 3, py: 1.5 }}
-          disabled={loading}
+          disabled={localLoading} // Disable the button during loading
         >
-          {loading ? (
+          {localLoading ? (
             <CircularProgress size={24} color="inherit" />
           ) : (
             "Add Campaign"
