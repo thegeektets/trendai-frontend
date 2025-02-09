@@ -80,6 +80,24 @@ export default function InfluencerSetup({
     );
 
     if (!result?.error) {
+      const storedUser = localStorage.getItem("user");
+      const user = storedUser ? JSON.parse(storedUser) : null;
+      if (user) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...user,
+            profile: {
+              user: user_id,
+              name: data.name,
+              socialMediaHandle: data.socialMediaHandle,
+              platform: data.platform,
+              followersCount: Number(data.followersCount),
+              email,
+            },
+          }),
+        );
+      }
       setSuccessMessage("Profile setup successful! Redirecting...");
       setTimeout(() => {
         router.push("/dashboard");
