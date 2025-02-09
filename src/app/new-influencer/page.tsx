@@ -6,12 +6,12 @@ import { useDispatch } from "react-redux";
 import { Box, Typography, Link as MuiLink, Alert } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import BrandSetup from "@/components/Brand/BrandSetup";
 import logo from "@/assets/logo.png";
 import gridImage from "@/assets/grids/grid-02.svg";
 import { AppDispatch } from "@/store";
+import InfluencerSetup from "@/components/Influencer/InfluencerSetup";
 
-export default function NewBrand() {
+export default function NewInfluencer() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
@@ -24,13 +24,13 @@ export default function NewBrand() {
       const storedToken = localStorage.getItem("token");
       if (!storedToken || storedToken === "undefined") {
         setError("Token not found. Redirecting...");
-        router.push("/auth/signin");
+        setTimeout(() => router.push("/auth/signin"), 2000);
         return;
       }
       const storedUser = localStorage.getItem("user");
       if (!storedUser) {
         setError("User not found. Redirecting...");
-        router.push("/auth/signin");
+        setTimeout(() => router.push("/auth/signin"), 2000);
         return;
       }
 
@@ -38,7 +38,7 @@ export default function NewBrand() {
 
       if (!parsedUser.id || !parsedUser.email) {
         setError("Invalid user data. Redirecting...");
-        router.push("/auth/signin");
+        setTimeout(() => router.push("/auth/signin"), 2000);
         return;
       }
 
@@ -46,8 +46,7 @@ export default function NewBrand() {
       setEmail(parsedUser.email);
     } catch (err) {
       setError("Failed to parse user data. Redirecting...");
-      console.error(err);
-      router.push("/auth/signin");
+      setTimeout(() => router.push("/auth/signin"), 2000);
     }
   }, [dispatch, router]);
 
@@ -83,7 +82,7 @@ export default function NewBrand() {
         sx={{ backgroundColor: "#fff", fontFamily: "Satoshi" }}
       >
         <Box width="100%" maxWidth={400} paddingTop={"60px"}>
-          <BrandSetup user_id={userId} />
+          <InfluencerSetup user_id={userId} email={email} />
         </Box>
       </Box>
 
@@ -111,15 +110,16 @@ export default function NewBrand() {
         </MuiLink>
 
         <Typography variant="h5" fontWeight="medium">
-          Setup Your Brand
+          Setup Your Influencer Account
         </Typography>
 
         <Typography variant="h4" fontWeight="bold" mt={1}>
-          Establish Your Presence
+          Earn from campaigns
         </Typography>
 
         <Typography variant="body1" maxWidth={375} mt={2}>
-          Create your brand profile and start connecting with influencers today!
+          Create your influencer profile and start participating in campaigns
+          today!
         </Typography>
 
         <Box mt={4}>
