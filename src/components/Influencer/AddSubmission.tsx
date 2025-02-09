@@ -16,11 +16,7 @@ import {
 import { AppDispatch } from "@/store";
 
 interface AddSubmissionProps {
-  campaign: {
-    _id: string;
-    name: string;
-    brand: string;
-  };
+  campaign: any;
   influencerId: string;
   onClose: () => void;
 }

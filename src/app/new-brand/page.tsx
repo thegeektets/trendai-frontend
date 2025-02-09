@@ -23,13 +23,13 @@ export default function NewBrand() {
       const storedToken = localStorage.getItem("token");
       if (!storedToken || storedToken === "undefined") {
         setError("Token not found. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 100);
+        router.push("/auth/signin");
         return;
       }
       const storedUser = localStorage.getItem("user");
       if (!storedUser) {
         setError("User not found. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 1000);
+        router.push("/auth/signin");
         return;
       }
 
@@ -37,14 +37,15 @@ export default function NewBrand() {
 
       if (!parsedUser.id || !parsedUser.email) {
         setError("Invalid user data. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 1000);
+        router.push("/auth/signin");
         return;
       }
 
       setUserId(parsedUser.id);
     } catch (err) {
       setError("Failed to parse user data. Redirecting...");
-      setTimeout(() => router.push("/auth/signin"), 1000);
+      console.error(err);
+      router.push("/auth/signin");
     }
   }, [dispatch, router]);
 

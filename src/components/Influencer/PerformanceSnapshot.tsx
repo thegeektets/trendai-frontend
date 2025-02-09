@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppDispatch } from "@/store";
 import { fetchSubmissionsByInfluencer } from "@/store/slices/submissionSlice";
 import {
@@ -32,7 +33,9 @@ export default function PerformanceSnapshot({
 
   const getBrandSubmissions = async (influencer: string) => {
     setLocalLoading(true);
-    const result = await dispatch(fetchSubmissionsByInfluencer(influencer));
+    const result: any = await dispatch(
+      fetchSubmissionsByInfluencer(influencer),
+    );
 
     if (result.payload) {
       setLocalSubmissions(result.payload);

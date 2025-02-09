@@ -36,7 +36,7 @@ export default function SubmissionApproval({
     (state: any) => state.submission,
   );
   const [localError, setLocalError] = useState<string | null>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string | null>("");
   const [localLoading, setLocalLoading] = useState<boolean>(false);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -44,11 +44,9 @@ export default function SubmissionApproval({
   };
 
   const handleStatusChange = async (submissionId: string, status: string) => {
-    const result = await dispatch(
+    const result: any = await dispatch(
       updateSubmission({ id: submissionId, status: status, approver: user }),
     );
-    console.log("result", result);
-
     if (result?.error) {
       setLocalError(result?.payload?.message);
 
