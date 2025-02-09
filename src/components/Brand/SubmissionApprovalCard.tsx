@@ -26,7 +26,7 @@ interface ApprovalCardProps {
   onStatusChange: (submissionId: string, status: string) => void;
 }
 
-const ApprovalCard: React.FC<ApprovalCardProps> = ({
+const SubmissionApprovalCard: React.FC<ApprovalCardProps> = ({
   submission,
   contentPreview,
   onStatusChange,
@@ -149,4 +149,4 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({
   );
 };
 
-export default ApprovalCard;
+export default SubmissionApprovalCard;

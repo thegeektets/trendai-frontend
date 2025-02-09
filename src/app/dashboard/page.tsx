@@ -126,7 +126,7 @@ export default function Dashboard() {
       case "campaigns":
         return <CampaignList />;
       case "performance":
-        return <PerformanceSnapshot />;
+        return <PerformanceSnapshot influencer={userDetails?._id} />;
       case "influencers":
         return <InfluencerList brand={userDetails?._id} />;
       case "submissions":

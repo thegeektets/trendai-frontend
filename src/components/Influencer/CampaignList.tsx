@@ -72,8 +72,8 @@ export default function CampaignList() {
 
   return (
     <Box p={3}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
-        Campaign List
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
+        Campaigns
       </Typography>
 
       {error && (

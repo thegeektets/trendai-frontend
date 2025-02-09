@@ -10,7 +10,7 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import ApprovalCard from "./ApprovalCard"; // Import the ApprovalCard component
+import SubmissionApprovalCard from "./SubmissionApprovalCard";
 import { fetchSocialMediaPreview } from "@/utils/preview";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/store";
@@ -37,7 +37,7 @@ export default function SubmissionApproval({
   );
   const [localError, setLocalError] = useState<string | null>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
-  const [localLoading, setLocalLoading] = useState<boolean>(false); // Local loading state
+  const [localLoading, setLocalLoading] = useState<boolean>(false);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -179,7 +179,7 @@ export default function SubmissionApproval({
                 : ["approved", "rejected", "pending"][tabValue - 1],
             ).map((submission) => (
               <Grid item xs={12} md={4} key={submission._id}>
-                <ApprovalCard
+                <SubmissionApprovalCard
                   submission={submission}
                   contentPreview={contentPreviews[submission.contentLink]}
                   onStatusChange={handleStatusChange}
