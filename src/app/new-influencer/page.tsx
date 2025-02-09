@@ -24,13 +24,13 @@ export default function NewInfluencer() {
       const storedToken = localStorage.getItem("token");
       if (!storedToken || storedToken === "undefined") {
         setError("Token not found. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 2000);
+        router.push("/auth/signin");
         return;
       }
       const storedUser = localStorage.getItem("user");
       if (!storedUser) {
         setError("User not found. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 2000);
+        router.push("/auth/signin");
         return;
       }
 
@@ -38,7 +38,7 @@ export default function NewInfluencer() {
 
       if (!parsedUser.id || !parsedUser.email) {
         setError("Invalid user data. Redirecting...");
-        setTimeout(() => router.push("/auth/signin"), 2000);
+        router.push("/auth/signin");
         return;
       }
 
@@ -46,6 +46,7 @@ export default function NewInfluencer() {
       setEmail(parsedUser.email);
     } catch (err) {
       setError("Failed to parse user data. Redirecting...");
+      console.error(err);
       setTimeout(() => router.push("/auth/signin"), 2000);
     }
   }, [dispatch, router]);
@@ -110,7 +111,7 @@ export default function NewInfluencer() {
         </MuiLink>
 
         <Typography variant="h5" fontWeight="medium">
-          Setup Your Influencer Account
+          Influencer Account
         </Typography>
 
         <Typography variant="h4" fontWeight="bold" mt={1}>
