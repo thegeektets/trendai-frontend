@@ -1,4 +1,12 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TrendAI Frontend
+
+## Description
+
+TrendAI is a platform that connects influencers with brands and SMEs. This frontend, built with Next.js, provides a user-friendly interface for managing campaigns, influencer submissions, and brand interactions.
+
+## Live Demo
+
+**Deployed Version:** [http://35.193.224.158/](http://35.193.224.158/)
 
 ## Getting Started
 
@@ -20,12 +28,20 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Features
+
+- **Campaign Management:** Brands can view and manage marketing campaigns.
+- **Influencer Submissions:** Influencers can submit content for review.
+- **Authentication & Authorization:** Secure login and access control for different user roles.
+- **Role-Based Access Control (RBAC):** Different access permissions for brands and influencers.
+- **Submission Management:** Brands can approve/reject influencer submissions and track campaign performance.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js Documentation](https://nextjs.org/docs) - Learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - An interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
