@@ -11,10 +11,14 @@ import {
   Chip,
   Stack,
   Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import SubmissionCard from "./SubmissionCard";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function PerformanceSnapshot({
   influencer,
@@ -49,7 +53,7 @@ export default function PerformanceSnapshot({
         acc.total += 1;
         return acc;
       },
-      { approved: 0, pending: 0, rejected: 0, total: 0 }
+      { approved: 0, pending: 0, rejected: 0, total: 0 },
     );
   };
 
@@ -81,86 +85,103 @@ export default function PerformanceSnapshot({
         <Grid container spacing={3}>
           {Object.values(localSubmissions).map((brand: any) => {
             const brandStats = calculateStats(
-              Object.values(brand.campaigns).flatMap((c: any) => c.submissions)
+              Object.values(brand.campaigns).flatMap((c: any) => c.submissions),
             );
 
             return (
               <Grid item xs={12} key={brand._id}>
-                <Card sx={{ p: 2, boxShadow: 3 }}>
+                <Card sx={{ boxShadow: 3 }}>
                   <CardContent>
-                    <Typography variant="h6" fontWeight="bold">
+                    <Typography variant="h6" fontWeight="bold" gutterBottom>
                       {brand.brandName}
                     </Typography>
-                    <Stack direction="row" spacing={1} mt={1} mb={2}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
+                      Industry: KES {brand.industry || "N/A"} | Website:{" "}
+                      {brand.website || "N/A"}
+                    </Typography>
+                    <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
                       <Chip
                         label={`Approved: ${brandStats.approved}`}
                         color="success"
-                        size="small"
+                        variant="outlined"
                       />
                       <Chip
                         label={`Pending: ${brandStats.pending}`}
                         color="warning"
-                        size="small"
+                        variant="outlined"
                       />
                       <Chip
                         label={`Rejected: ${brandStats.rejected}`}
                         color="error"
-                        size="small"
+                        variant="outlined"
                       />
                       <Chip
                         label={`Total: ${brandStats.total}`}
                         color="primary"
-                        size="small"
+                        variant="outlined"
                       />
                     </Stack>
-                    <Divider sx={{ my: 2 }} />
+                    <Divider sx={{ mb: 2 }} />
 
                     {Object.values(brand.campaigns).map((campaign: any) => {
                       const campaignStats = calculateStats(
-                        campaign.submissions
+                        campaign.submissions,
                       );
                       return (
-                        <Box key={campaign._id} sx={{ mt: 3 }}>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            {campaign.campaignName}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                            Budget: KES {campaign.budget?.toLocaleString() || "N/A"} | 
-                            Start: {campaign.startDate || "N/A"} | 
-                            End: {campaign.endDate || "N/A"} | 
-                            Status: {campaign.status || "N/A"}
-                          </Typography>
-                          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                            <Chip
-                              label={`Approved: ${campaignStats.approved}`}
-                              color="success"
-                              size="small"
-                            />
-                            <Chip
-                              label={`Pending: ${campaignStats.pending}`}
-                              color="warning"
-                              size="small"
-                            />
-                            <Chip
-                              label={`Rejected: ${campaignStats.rejected}`}
-                              color="error"
-                              size="small"
-                            />
-                            <Chip
-                              label={`Total: ${campaignStats.total}`}
-                              color="primary"
-                              size="small"
-                            />
-                          </Stack>
+                        <Accordion key={campaign._id} sx={{ mb: 2 }}>
+                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant="subtitle1" fontWeight="bold">
+                              {campaign.campaignName}
+                            </Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ mb: 2 }}
+                            >
+                              Budget: KES{" "}
+                              {campaign.budget?.toLocaleString() || "N/A"} |
+                              Start: {campaign.startDate || "N/A"} | End:{" "}
+                              {campaign.endDate || "N/A"} | Status:{" "}
+                              {campaign.status || "N/A"}
+                            </Typography>
+                            <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                              <Chip
+                                label={`Approved: ${campaignStats.approved}`}
+                                color="success"
+                                variant="outlined"
+                              />
+                              <Chip
+                                label={`Pending: ${campaignStats.pending}`}
+                                color="warning"
+                                variant="outlined"
+                              />
+                              <Chip
+                                label={`Rejected: ${campaignStats.rejected}`}
+                                color="error"
+                                variant="outlined"
+                              />
+                              <Chip
+                                label={`Total: ${campaignStats.total}`}
+                                color="primary"
+                                variant="outlined"
+                              />
+                            </Stack>
 
-                          <Grid container spacing={2}>
-                            {campaign.submissions.map((submission: any) => (
-                              <Grid item xs={12} md={4} key={submission._id}>
-                                <SubmissionCard submission={submission} />
-                              </Grid>
-                            ))}
-                          </Grid>
-                        </Box>
+                            <Grid container spacing={2}>
+                              {campaign.submissions.map((submission: any) => (
+                                <Grid item xs={12} md={4} key={submission._id}>
+                                  <SubmissionCard submission={submission} />
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </AccordionDetails>
+                        </Accordion>
                       );
                     })}
                   </CardContent>
