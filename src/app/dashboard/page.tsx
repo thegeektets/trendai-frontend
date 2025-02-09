@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   Box,
@@ -25,6 +25,7 @@ import {
   CheckCircle,
   AddCircle,
 } from "@mui/icons-material";
+import React from "react";
 
 const drawerWidth = 240;
 
@@ -60,6 +61,7 @@ export default function Dashboard() {
   const [selectedPage, setSelectedPage] = useState<string>("Campaign");
   const [userDetails, setUserDetails] = useState<any>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Fetch user details and set role
   useEffect(() => {
@@ -77,9 +79,8 @@ export default function Dashboard() {
 
     setRole(parsedUser.role);
     setUserDetails({ userId: parsedUser._id, ...parsedUser.profile });
-
+    const queryPage = searchParams.get("page");
     // Set the selected page based on the query or default
-    const queryPage = router.query?.page;
     if (queryPage) {
       const formattedPage = queryPage.replace(/-/g, " ");
       setSelectedPage(formattedPage);
@@ -91,7 +92,7 @@ export default function Dashboard() {
         .toLowerCase();
       router.push(`/dashboard?page=${formattedDefaultPage}`);
     }
-  }, [router.query]);
+  }, [router, searchParams]);
 
   // Memoize menu items based on role
   const menuItems = useMemo(() => {
@@ -242,25 +243,22 @@ export default function Dashboard() {
           {renderUserProfile}
         </Paper>
         <List>
-          {menuItems.flatMap(({ text, icon }) => [
-            <ListItem
-              key={text}
-              button
-              onClick={() => handleMenuClick(text)}
-              sx={{
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.2)",
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: "white" }}>{icon}</ListItemIcon>
-              <ListItemText primary={text} sx={{ color: "white" }} />
-            </ListItem>,
-            <Divider
-              key={`${text}-divider`}
-              sx={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
-            />,
-          ])}
+          {menuItems.map(({ text, icon }) => (
+            <React.Fragment key={text}>
+              <ListItem
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  },
+                }}
+                onClick={() => handleMenuClick(text)}
+              >
+                <ListItemIcon sx={{ color: "white" }}>{icon}</ListItemIcon>
+                <ListItemText primary={text} sx={{ color: "white" }} />
+              </ListItem>
+              <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }} />
+            </React.Fragment>
+          ))}
         </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
