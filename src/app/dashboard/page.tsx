@@ -26,6 +26,7 @@ import {
   AddCircle,
 } from "@mui/icons-material";
 import React from "react";
+import { Suspense } from "react";
 
 const drawerWidth = 240;
 
@@ -56,7 +57,7 @@ const SubmissionApproval = dynamic(
 );
 const AddCampaign = dynamic(() => import("@/components/Brand/AddCampaign"));
 
-export default function Dashboard() {
+function DashboardContent() {
   const [role, setRole] = useState<string | null>(null);
   const [selectedPage, setSelectedPage] = useState<string>("Campaign");
   const [userDetails, setUserDetails] = useState<any>(null);
@@ -265,5 +266,13 @@ export default function Dashboard() {
         {renderPage}
       </Box>
     </Box>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
